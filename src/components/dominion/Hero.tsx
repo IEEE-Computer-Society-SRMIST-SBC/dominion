@@ -33,10 +33,24 @@ export default function Hero() {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-28 pb-20 text-center">
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
+          className="mb-8 flex flex-wrap justify-center items-center gap-6 sm:gap-8"
+        >
+          <img src="/srmlogo.png" alt="SRM" className="h-12 sm:h-20 object-contain" />
+          <img src="/soclogo.png" alt="School of Computing" className="h-12 sm:h-20 object-contain" />
+          <img src="/cintellogo.png" alt="Cintel" className="h-12 sm:h-16 object-contain" />
+          <img src="/ctechlogo.png" alt="CTECH" className="h-12 sm:h-20 object-contain" />
+          <img src="/hrcclogo.png" alt="HRCC" className="h-6 sm:h-8 object-contain" />
+          <img src="/ieeecslogo.png" alt="IEEE CS" className="h-20 sm:h-28 object-contain" />
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
           className="font-display text-[0.6rem] tracking-[0.35em] text-steel uppercase sm:text-xs"
         >
           HackerRank Campus Crew SRMIST <span style={{ color: "var(--color-thor)" }}>×</span> IEEE Computer Society Present
