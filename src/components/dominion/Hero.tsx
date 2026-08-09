@@ -47,15 +47,6 @@ export default function Hero() {
           <img src="/ieeecslogo.png" alt="IEEE CS" className="h-20 sm:h-28 object-contain" />
         </motion.div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1 }}
-          className="font-display text-[0.6rem] tracking-[0.35em] text-steel uppercase sm:text-xs"
-        >
-          HackerRank Campus Crew SRMIST <span style={{ color: "var(--color-thor)" }}>×</span> IEEE Computer Society Present
-        </motion.p>
-
         <motion.img
           src="/logo.png"
           alt="Dominion"

@@ -30,8 +30,11 @@ function Rocket({ scrollY }: { scrollY: any }) {
     group.current.rotation.z = 0; // Keep it perfectly vertical
   });
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const rocketScale = isMobile ? 0.15 : 0.3;
+
   return (
-    <group ref={group} scale={0.3}>
+    <group ref={group} scale={rocketScale}>
       <primitive object={scene} />
     </group>
   );
@@ -84,10 +87,14 @@ function Exhaust({ scrollY }: { scrollY: any }) {
       const accProgress = Math.pow(progress, 2);
       const rY = -2 + (accProgress * 4) + Math.sin(state.clock.elapsedTime * 2) * 0.1 + blastOff;
       
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      const offset = isMobile ? 0.6 : 1.2;
+      const spread = isMobile ? 0.75 : 1.5;
+
       // Spawn Fumes
       for (let i = 0; i < Math.floor(2 * intensity); i++) {
         const p = fumes[nextFume];
-        p.position.set((Math.random() - 0.5) * 1.5, rY - 1.2, (Math.random() - 0.5) * 1.5);
+        p.position.set((Math.random() - 0.5) * spread, rY - offset, (Math.random() - 0.5) * spread);
         p.velocity.set((Math.random() - 0.5) * 1.0, -1.5 - Math.random() * 2.0, (Math.random() - 0.5) * 1.0);
         p.life = p.maxLife;
         nextFume = (nextFume + 1) % fumeCount;
@@ -96,7 +103,7 @@ function Exhaust({ scrollY }: { scrollY: any }) {
       // Spawn Sparks
       for (let i = 0; i < Math.floor(3 * intensity); i++) {
         const p = sparks[nextSpark];
-        p.position.set((Math.random() - 0.5) * 1.5, rY - 1.2, (Math.random() - 0.5) * 1.5);
+        p.position.set((Math.random() - 0.5) * spread, rY - offset, (Math.random() - 0.5) * spread);
         p.velocity.set((Math.random() - 0.5) * 3, -4 - Math.random() * 5, (Math.random() - 0.5) * 3);
         p.life = p.maxLife;
         nextSpark = (nextSpark + 1) % sparkCount;

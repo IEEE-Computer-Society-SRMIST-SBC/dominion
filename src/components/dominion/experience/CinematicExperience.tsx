@@ -11,19 +11,20 @@ useGLTF.preload("/mjolnir_thors_hammer.glb");
 // ─── Camera Rig ────────────────────────────────────────────────────────────
 function CameraRig({ shakeRef }: { shakeRef: React.RefObject<number> }) {
   const { camera } = useThree();
-  const basePos = useRef(new THREE.Vector3(0, 0, 4));
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const basePos = useRef(new THREE.Vector3(0, 0, isMobile ? 6 : 4));
   const lookAtTarget = useRef(new THREE.Vector3(0, 0, 0));
 
   useEffect(() => {
     // Flight
     gsap.fromTo(basePos.current, 
-      { x: -1, y: -0.5, z: 2.5 },
-      { x: 0, y: 0, z: 4.5, duration: 4.0, delay: 0.05, ease: "power1.inOut" }
+      { x: isMobile ? -0.5 : -1, y: -0.5, z: isMobile ? 4.5 : 2.5 },
+      { x: 0, y: 0, z: isMobile ? 6.5 : 4.5, duration: 4.0, delay: 0.05, ease: "power1.inOut" }
     );
 
     // Impact Pullback
     gsap.to(basePos.current, {
-      x: 0, y: 0.5, z: 7,
+      x: 0, y: 0.5, z: isMobile ? 9 : 7,
       duration: 3.0,
       ease: "expo.out",
       delay: 4.05
@@ -172,7 +173,7 @@ function LightningBolt({ color, extent }: { color: string; extent: number }) {
 
 // ─── Main Sequence Orchestrator ────────────────────────────────────────────
 function SceneOrchestrator({ 
-  shakeRef, flashRef, textMatRef
+  shakeRef, flashRef, textMatRef, onShatter
 }: any) {
   const { scene } = useGLTF("/mjolnir_thors_hammer.glb");
   const hammerGroup = useRef<THREE.Group>(null!);
@@ -222,6 +223,11 @@ function SceneOrchestrator({
     // 4. Fade text out fast right before shatter
     tl.to(textMatRef.current, { opacity: 0, duration: 0.2 }, 4.4); 
     
+    // 5. Trigger the screen shatter at exactly 4.6s in the timeline
+    tl.add(() => {
+      if (onShatter) onShatter();
+    }, 4.6);
+
     // Note: The hammer stays on screen! The background shattering handles the exit.
   }, []);
 
@@ -292,27 +298,19 @@ const SHARDS = [
 export default function CinematicExperience({ onComplete }: { onComplete: () => void }) {
   const [visible, setVisible] = useState(true);
   const [shattered, setShattered] = useState(false);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   
   const shakeRef = useRef(0);
   const flashRef = useRef(0);
   const textMatRef = useRef<THREE.MeshBasicMaterial>(null!);
 
-  useEffect(() => {
-    // Break the screen like glass right after impact (at 4.6 seconds)
-    const tShatter = setTimeout(() => {
-      setShattered(true);
-    }, 4600);
-
-    // Completely unmount at 8.5 seconds to accommodate the slow-motion drop
-    const tExit = setTimeout(() => {
+  const handleShatter = () => {
+    setShattered(true);
+    // Unmount a few seconds after the shatter
+    setTimeout(() => {
       setVisible(false);
-    }, 8500);
-
-    return () => {
-      clearTimeout(tShatter);
-      clearTimeout(tExit);
-    };
-  }, []);
+    }, 3900);
+  };
 
   return (
     <AnimatePresence onExitComplete={onComplete}>
@@ -364,16 +362,17 @@ export default function CinematicExperience({ onComplete }: { onComplete: () => 
                 <Center position={[0, 4, -15]}>
                   <Text3D 
                     font="https://threejs.org/examples/fonts/helvetiker_bold.typeface.json" 
-                    size={1.5} height={0.4} curveSegments={12} 
+                    size={isMobile ? 0.8 : 1.5} height={0.4} curveSegments={12} 
                     bevelEnabled bevelThickness={0.05} bevelSize={0.02} bevelOffset={0} bevelSegments={5}
+                    lineHeight={isMobile ? 1.2 : 1}
                   >
-                    Once upon a time in space.
+                    {isMobile ? "Once upon\na time\nin space." : "Once upon a time in space."}
                     <meshBasicMaterial ref={textMatRef} color="#ffffff" transparent opacity={1} />
                   </Text3D>
                 </Center>
 
                 <SceneOrchestrator 
-                  shakeRef={shakeRef} flashRef={flashRef} textMatRef={textMatRef}
+                  shakeRef={shakeRef} flashRef={flashRef} textMatRef={textMatRef} onShatter={handleShatter}
                 />
               </Suspense>
             </Canvas>
