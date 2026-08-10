@@ -179,7 +179,11 @@
   }
 
   body {
-    background-color: var(--color-void);
+    background-color: #000;
+    background-image: url('/rocket_space_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;

@@ -109,6 +109,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script defer async src="https://apply.devfolio.co/v2/sdk.js"></script>
       </head>
       <body>
         {children}

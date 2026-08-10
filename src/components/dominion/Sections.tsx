@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import {
   Brain,
   CalendarDays,
@@ -23,13 +22,13 @@ const reveal = {
 export function SectionTitle({ kicker, title }: { kicker: string; title: string }) {
   return (
     <motion.div {...reveal} className="mb-12 text-center">
-      <p className="font-display text-[0.6rem] tracking-[0.4em] text-primary uppercase">{kicker}</p>
-      <h2 className="text-chrome mt-3 font-display text-3xl font-black tracking-[0.08em] uppercase sm:text-5xl">
+      <p className="font-mono text-[0.6rem] tracking-[0.4em] text-[#9ca3af] uppercase">{kicker}</p>
+      <h2 className="text-[#e2e4e9] mt-3 font-mono text-3xl font-black tracking-[0.15em] uppercase sm:text-5xl" style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.8)" }}>
         {title}
       </h2>
       <div
-        className="mx-auto mt-5 h-px w-40"
-        style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
+        className="mx-auto mt-5 h-1 w-24 rounded-full"
+        style={{ background: "linear-gradient(90deg, transparent, #ffb000, transparent)", opacity: 0.5 }}
       />
     </motion.div>
   );
@@ -50,32 +49,47 @@ export function Highlights() {
   return (
     <section id="about" className="relative border-y border-border py-24">
       <div className="absolute inset-0 tech-grid opacity-20" />
-      <div className="relative mx-auto max-w-7xl px-6">
-        <SectionTitle kicker="The Arena" title="Event Highlights" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="relative mx-auto max-w-5xl px-6">
+        <SectionTitle kicker="The Arena" title="System Status" />
+        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-5">
           {highlights.map((h, i) => (
             <motion.div
               key={h.label}
-              {...reveal}
-              transition={{ ...reveal.transition, delay: i * 0.08 }}
-              className="glass-panel-thor group gothic-arch relative overflow-hidden p-6 pt-10 hover-loki-illusion"
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className={`group relative flex flex-col justify-between overflow-hidden rounded-md border-2 border-[#111] p-6 ${
+                i === 0 ? "md:col-span-2 md:row-span-2 p-8" :
+                i === 1 ? "md:col-span-2" :
+                "md:col-span-1"
+              }`}
+              style={{
+                backgroundColor: "#030c05",
+                boxShadow: "inset 4px 4px 15px rgba(0, 0, 0, 0.9), inset -2px -2px 8px rgba(255, 255, 255, 0.05), 1px 1px 2px rgba(255, 255, 255, 0.1)",
+                backgroundImage: "linear-gradient(rgba(0, 255, 0, 0.03) 50%, transparent 50%)",
+                backgroundSize: "100% 4px",
+              }}
             >
-              <div
-                className="animate-glow-pulse absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full blur-2xl"
-                style={{ backgroundColor: "var(--color-thor)", opacity: 0.25 }}
+              <h.icon 
+                className={`transition-colors ${i === 0 ? "mb-6 h-8 w-8" : "mb-4 h-5 w-5"}`} 
+                style={{ color: "#00ff41", filter: "drop-shadow(0 0 5px #00ff41)" }} 
               />
-              <h.icon
-                className="relative h-6 w-6 animate-lightning"
-                strokeWidth={1.5}
-                style={{ color: "var(--color-thor)" }}
-              />
-              <p
-                className="relative mt-5 font-display text-[0.6rem] tracking-[0.3em] uppercase"
-                style={{ color: "var(--color-thor)" }}
-              >
-                {h.label}
-              </p>
-              <p className="relative mt-2 text-sm leading-relaxed text-chrome">{h.value}</p>
+              <div>
+                <p 
+                  className="font-mono text-[0.65rem] tracking-widest uppercase" 
+                  style={{ color: "#00aa2b" }}
+                >
+                  {h.label}
+                </p>
+                <p 
+                  className={`mt-2 font-mono font-bold ${i === 0 ? "text-2xl" : "text-sm"}`} 
+                  style={{ color: "#00ff41", textShadow: "0 0 8px #00ff41" }}
+                >
+                  {h.value}
+                </p>
+              </div>
+              <div className="absolute inset-0 pointer-events-none rounded-md ring-1 ring-inset ring-[#00ff41]/20" />
             </motion.div>
           ))}
         </div>
@@ -107,56 +121,59 @@ const tracks = [
   },
 ];
 
-function TiltCard({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.div
-      whileHover={{ rotateX: -7, rotateY: 7, y: -8 }}
-      transition={{ type: "spring", stiffness: 220, damping: 18 }}
-      style={{ transformStyle: "preserve-3d", perspective: 900 }}
-      className="glass-panel-loki hover-loki-illusion relative overflow-hidden p-7"
-    >
-      {children}
-    </motion.div>
-  );
-}
+
 
 export function Tracks() {
   return (
     <section id="tracks" className="relative py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionTitle kicker="Choose Your Domain" title="Tracks" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto max-w-5xl px-6">
+        <SectionTitle kicker="Hardware Uplink" title="Modules" />
+        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-5">
           {tracks.map((t, i) => (
             <motion.div
               key={t.name}
-              {...reveal}
-              transition={{ ...reveal.transition, delay: i * 0.08 }}
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ 
+                y: 3, 
+                boxShadow: "inset 2px 2px 8px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02), 2px 2px 5px rgba(0,0,0,0.5)" 
+              }}
+              className={`group relative flex flex-col justify-between overflow-hidden rounded-lg p-6 cursor-pointer ${
+                i === 0 ? "md:col-span-2 md:row-span-2 p-8" :
+                i === 3 ? "md:col-span-2" :
+                "md:col-span-1"
+              }`}
+              style={{
+                background: "linear-gradient(145deg, #2a2d34 0%, #1c1e22 100%)",
+                borderTop: "2px solid #3e4149",
+                borderLeft: "2px solid #3e4149",
+                borderBottom: "2px solid #0c0d10",
+                borderRight: "2px solid #0c0d10",
+                boxShadow: "8px 8px 18px rgba(0,0,0,0.9), -2px -2px 10px rgba(255,255,255,0.03), inset 1px 1px 2px rgba(255,255,255,0.1), inset -1px -1px 2px rgba(0,0,0,0.6)",
+              }}
             >
-              <TiltCard>
-                <div
-                  className="absolute inset-x-0 top-0 h-px"
-                  style={{ background: "var(--gradient-loki)" }}
+              {/* Screws */}
+              <div className="absolute top-3 left-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute top-3 right-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-3 left-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-3 right-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+
+              <div className="absolute right-0 top-0 -mr-6 -mt-6 opacity-5 mix-blend-overlay">
+                <t.icon className="h-48 w-48" />
+              </div>
+
+              <div className="relative z-10 flex h-full flex-col justify-between">
+                <t.icon 
+                  className={`${i === 0 ? "mb-10 h-14 w-14" : "mb-8 h-8 w-8"}`} 
+                  style={{ color: "#ffb000", filter: "drop-shadow(0 0 8px #ffb000)" }}
                 />
-                <div
-                  className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-2xl"
-                  style={{ backgroundColor: "var(--color-loki)", opacity: 0.15 }}
-                />
-                <t.icon
-                  className="h-8 w-8"
-                  strokeWidth={1.4}
-                  style={{ color: "var(--color-loki)" }}
-                />
-                <h3 className="text-chrome mt-6 font-display text-lg font-bold tracking-[0.14em] uppercase">
-                  {t.name}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.desc}</p>
-                <p
-                  className="mt-6 font-display text-[0.55rem] tracking-[0.3em] uppercase"
-                  style={{ color: "var(--color-loki)" }}
-                >
-                  0{i + 1} / Track
-                </p>
-              </TiltCard>
+                <div>
+                  <h3 className={`font-mono font-black tracking-widest text-[#e2e4e9] uppercase ${i === 0 ? "text-3xl" : "text-lg"}`} style={{ textShadow: "1px 1px 2px #000" }}>{t.name}</h3>
+                  <p className={`mt-3 font-mono leading-relaxed text-[#9ca3af] ${i === 0 ? "text-base" : "text-sm"}`}>{t.desc}</p>
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -166,56 +183,58 @@ export function Tracks() {
 }
 
 export function Sponsors() {
-  useEffect(() => {
-    const existing = document.querySelector('script[src="https://apply.devfolio.co/v2/sdk.js"]');
-    if (existing) {
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://apply.devfolio.co/v2/sdk.js";
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <section id="sponsors" className="relative border-y border-border py-24">
       <div className="absolute inset-0 tech-grid opacity-20" />
       <div className="relative mx-auto max-w-5xl px-6">
-        <SectionTitle kicker="Backed By" title="Sponsors" />
+        <SectionTitle kicker="Mainframe Uplink" title="Command Console" />
         <motion.div
-          {...reveal}
-          className="glass-panel-thor group gothic-arch relative mx-auto block max-w-2xl overflow-hidden p-8 text-center hover-loki-illusion"
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-8 rounded-xl p-8 md:flex-row md:p-10 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(145deg, #1f2126 0%, #141619 100%)",
+            borderTop: "3px solid #33373e",
+            borderLeft: "3px solid #33373e",
+            borderBottom: "3px solid #090a0c",
+            borderRight: "3px solid #090a0c",
+            boxShadow: "10px 10px 25px rgba(0,0,0,0.9), inset 2px 2px 5px rgba(255,255,255,0.05)",
+          }}
         >
-          <div
-            className="absolute -top-20 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full blur-3xl"
-            style={{ backgroundColor: "var(--color-thor)", opacity: 0.2 }}
-          />
-          <p
-            className="relative font-display text-[0.6rem] tracking-[0.3em] uppercase"
-            style={{ color: "var(--color-thor)" }}
+          {/* Hardware Grip Texture on left edge */}
+          <div className="hidden md:flex flex-col gap-2 opacity-30 absolute left-4 inset-y-0 py-8 justify-center">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-1 w-12 rounded-full bg-black shadow-[1px_1px_1px_rgba(255,255,255,0.1)]" />
+            ))}
+          </div>
+
+          <div className="flex flex-col items-center md:items-start md:ml-12 relative z-10">
+            <p className="mb-3 font-mono text-[0.65rem] tracking-widest text-[#9ca3af] uppercase">Platform Partner Uplink</p>
+            <div className="rounded border-2 border-[#111] p-3 bg-[#0a0b0d] shadow-[inset_2px_2px_10px_rgba(0,0,0,0.8)]">
+              <img src="/devfoliologo.svg" alt="DEVFOLIO LOGO" className="h-8 w-auto opacity-80" />
+            </div>
+            <p className="mt-5 max-w-xs font-mono text-sm leading-relaxed text-[#7a8190]">
+              System initializing official buildathon deployment protocols. Awaiting applicant authorization.
+            </p>
+          </div>
+          
+          {/* Recessed Button Chamber */}
+          <div 
+            className="shrink-0 p-4 rounded-lg border-2 border-[#111] bg-[#050608]"
+            style={{ boxShadow: "inset 5px 5px 15px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02)" }}
           >
-            Platform Partner
-          </p>
-          <img
-            src="/Devfolio - White.png"
-            alt="DEVFOLIO LOGO"
-            className="relative mx-auto mt-4 h-10 w-auto object-contain sm:h-12"
-          />
-          <p className="relative mt-4 text-sm text-muted-foreground">
-            Powering the official buildathon platform for registrations and submissions.
-          </p>
-          <div
-            className="apply-button relative mx-auto mt-6"
-            data-hackathon-slug="dominion2026"
-            data-button-theme="light"
-            style={{ height: "44px", width: "312px" }}
-          />
+            <div className="mb-3 flex items-center justify-between">
+              <span className="font-mono text-[0.55rem] tracking-widest text-[#ff2a2a] uppercase">Authorize</span>
+              <div className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: "#ff2a2a", boxShadow: "0 0 8px #ff2a2a" }} />
+            </div>
+            <div
+              className="apply-button relative"
+              data-hackathon-slug="dominion2026"
+              data-button-theme="dark"
+              style={{ height: "44px", width: "312px" }}
+            />
+          </div>
         </motion.div>
       </div>
     </section>
