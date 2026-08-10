@@ -37,7 +37,11 @@ export function SectionTitle({ kicker, title }: { kicker: string; title: string 
 const highlights = [
   { icon: CalendarDays, label: "Dates", value: "September 2nd – 3rd, 2026" },
   { icon: Layers, label: "Format", value: "Hybrid Buildathon (Offline + Online)" },
-  { icon: MapPin, label: "Offline Venue", value: "SRM Institute of Science and Technology, KTR Campus" },
+  {
+    icon: MapPin,
+    label: "Offline Venue",
+    value: "SRM Institute of Science and Technology, KTR Campus",
+  },
   { icon: Monitor, label: "Online Venue", value: "Official Remote Event Platform" },
 ];
 
@@ -55,9 +59,19 @@ export function Highlights() {
               transition={{ ...reveal.transition, delay: i * 0.08 }}
               className="glass-panel-thor group gothic-arch relative overflow-hidden p-6 pt-10 hover-loki-illusion"
             >
-              <div className="animate-glow-pulse absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full blur-2xl" style={{ backgroundColor: "var(--color-thor)", opacity: 0.25 }} />
-              <h.icon className="relative h-6 w-6 animate-lightning" strokeWidth={1.5} style={{ color: "var(--color-thor)" }} />
-              <p className="relative mt-5 font-display text-[0.6rem] tracking-[0.3em] uppercase" style={{ color: "var(--color-thor)" }}>
+              <div
+                className="animate-glow-pulse absolute -top-14 left-1/2 h-28 w-28 -translate-x-1/2 rounded-full blur-2xl"
+                style={{ backgroundColor: "var(--color-thor)", opacity: 0.25 }}
+              />
+              <h.icon
+                className="relative h-6 w-6 animate-lightning"
+                strokeWidth={1.5}
+                style={{ color: "var(--color-thor)" }}
+              />
+              <p
+                className="relative mt-5 font-display text-[0.6rem] tracking-[0.3em] uppercase"
+                style={{ color: "var(--color-thor)" }}
+              >
                 {h.label}
               </p>
               <p className="relative mt-2 text-sm leading-relaxed text-chrome">{h.value}</p>
@@ -112,16 +126,33 @@ export function Tracks() {
         <SectionTitle kicker="Choose Your Domain" title="Tracks" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {tracks.map((t, i) => (
-            <motion.div key={t.name} {...reveal} transition={{ ...reveal.transition, delay: i * 0.08 }}>
+            <motion.div
+              key={t.name}
+              {...reveal}
+              transition={{ ...reveal.transition, delay: i * 0.08 }}
+            >
               <TiltCard>
-                <div className="absolute inset-x-0 top-0 h-px" style={{ background: "var(--gradient-loki)" }} />
-                <div className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-2xl" style={{ backgroundColor: "var(--color-loki)", opacity: 0.15 }} />
-                <t.icon className="h-8 w-8" strokeWidth={1.4} style={{ color: "var(--color-loki)" }} />
+                <div
+                  className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: "var(--gradient-loki)" }}
+                />
+                <div
+                  className="absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-2xl"
+                  style={{ backgroundColor: "var(--color-loki)", opacity: 0.15 }}
+                />
+                <t.icon
+                  className="h-8 w-8"
+                  strokeWidth={1.4}
+                  style={{ color: "var(--color-loki)" }}
+                />
                 <h3 className="text-chrome mt-6 font-display text-lg font-bold tracking-[0.14em] uppercase">
                   {t.name}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.desc}</p>
-                <p className="mt-6 font-display text-[0.55rem] tracking-[0.3em] uppercase" style={{ color: "var(--color-loki)" }}>
+                <p
+                  className="mt-6 font-display text-[0.55rem] tracking-[0.3em] uppercase"
+                  style={{ color: "var(--color-loki)" }}
+                >
                   0{i + 1} / Track
                 </p>
               </TiltCard>
@@ -133,7 +164,40 @@ export function Tracks() {
   );
 }
 
-
+export function Sponsors() {
+  return (
+    <section id="sponsors" className="relative border-y border-border py-24">
+      <div className="absolute inset-0 tech-grid opacity-20" />
+      <div className="relative mx-auto max-w-5xl px-6">
+        <SectionTitle kicker="Backed By" title="Sponsors" />
+        <motion.a
+          href="https://devfolio.co"
+          target="_blank"
+          rel="noreferrer"
+          {...reveal}
+          className="glass-panel-thor group gothic-arch relative mx-auto block max-w-2xl overflow-hidden p-8 text-center hover-loki-illusion"
+        >
+          <div
+            className="absolute -top-20 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full blur-3xl"
+            style={{ backgroundColor: "var(--color-thor)", opacity: 0.2 }}
+          />
+          <p
+            className="relative font-display text-[0.6rem] tracking-[0.3em] uppercase"
+            style={{ color: "var(--color-thor)" }}
+          >
+            Platform Partner
+          </p>
+          <h3 className="text-chrome relative mt-4 font-display text-3xl font-black tracking-[0.16em] uppercase">
+            Devfolio
+          </h3>
+          <p className="relative mt-4 text-sm text-muted-foreground">
+            Powering the official buildathon platform for registrations and submissions.
+          </p>
+        </motion.a>
+      </div>
+    </section>
+  );
+}
 
 export function Venues() {
   return (
@@ -202,7 +266,9 @@ export function Contact() {
                 <Phone className="h-4 w-4 text-accent" />
               </span>
               <span>
-                <span className="text-chrome block font-display text-sm tracking-[0.2em] uppercase">{o.name}</span>
+                <span className="text-chrome block font-display text-sm tracking-[0.2em] uppercase">
+                  {o.name}
+                </span>
                 <span className="mt-1 block text-sm text-muted-foreground">+91 {o.phone}</span>
               </span>
             </motion.a>
@@ -247,7 +313,9 @@ export function Footer() {
           ))}
         </div>
         <div className="mt-10 text-center">
-          <p className="text-chrome font-display text-xl font-black tracking-[0.35em] uppercase">Dominion</p>
+          <p className="text-chrome font-display text-xl font-black tracking-[0.35em] uppercase">
+            Dominion
+          </p>
           <p className="mt-3 text-xs tracking-[0.18em] text-muted-foreground uppercase">
             HackerRank Campus Crew SRMIST × IEEE Computer Society
           </p>
