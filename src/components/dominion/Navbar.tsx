@@ -45,11 +45,7 @@ export default function Navbar() {
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-void/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-1.5 overflow-hidden">
-          <img 
-            src="/logo.png" 
-            alt="Dominion" 
-            className="h-6 object-contain sm:h-8" 
-          />
+          <img src="/logo.png" alt="Dominion" className="h-6 object-contain sm:h-8" />
         </div>
 
         <nav className="hidden items-center gap-7 lg:flex">
@@ -68,11 +64,11 @@ export default function Navbar() {
           <motion.a
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            href="#register"
+            href="#sponsors"
             className="hidden rounded-sm border border-primary/60 px-4 py-2 font-display text-[0.65rem] tracking-[0.22em] text-primary-foreground uppercase transition-shadow duration-500 sm:block"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </motion.a>
           <button
             aria-label="Toggle navigation"
@@ -97,12 +93,12 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href="#register"
+            href="#sponsors"
             onClick={() => setOpen(false)}
             className="mt-3 block rounded-sm px-4 py-2.5 text-center font-display text-[0.7rem] tracking-[0.22em] text-primary-foreground uppercase"
             style={{ background: "var(--gradient-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </a>
         </div>
       )}

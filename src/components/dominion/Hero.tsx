@@ -9,7 +9,10 @@ export default function Hero() {
   useEffect(() => setMounted(true), []);
 
   return (
-    <section id="home" className="scanlines relative flex min-h-screen items-center overflow-hidden">
+    <section
+      id="home"
+      className="scanlines relative flex min-h-screen items-center overflow-hidden"
+    >
       <div className="absolute inset-0 tech-grid opacity-40" />
       <div className="absolute inset-0">
         {mounted && (
@@ -28,7 +31,8 @@ export default function Hero() {
       <div
         className="animate-sweep pointer-events-none absolute inset-x-0 top-0 h-24 opacity-30"
         style={{
-          background: "linear-gradient(to bottom, transparent, oklch(0.85 0.22 155 / 22%), transparent)",
+          background:
+            "linear-gradient(to bottom, transparent, oklch(0.85 0.22 155 / 22%), transparent)",
         }}
       />
 
@@ -40,7 +44,11 @@ export default function Hero() {
           className="mb-8 flex flex-wrap justify-center items-center gap-6 sm:gap-8"
         >
           <img src="/srmlogo.png" alt="SRM" className="h-12 sm:h-20 object-contain" />
-          <img src="/soclogo.png" alt="School of Computing" className="h-12 sm:h-20 object-contain" />
+          <img
+            src="/soclogo.png"
+            alt="School of Computing"
+            className="h-12 sm:h-20 object-contain"
+          />
           <img src="/cintellogo.png" alt="Cintel" className="h-12 sm:h-16 object-contain" />
           <img src="/ctechlogo.png" alt="CTECH" className="h-12 sm:h-20 object-contain" />
           <img src="/hrcclogo.png" alt="HRCC" className="h-6 sm:h-8 object-contain" />
@@ -89,12 +97,11 @@ export default function Hero() {
           className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
           <a
-            id="register"
-            href="#contact"
+            href="#sponsors"
             className="group relative w-full overflow-hidden rounded-sm px-8 py-3.5 font-display text-[0.7rem] tracking-[0.28em] text-primary-foreground uppercase transition-all duration-500 hover:brightness-115 sm:w-auto"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </a>
           <a
             href="#tracks"
