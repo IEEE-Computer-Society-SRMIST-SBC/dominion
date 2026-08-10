@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CinematicExperience from "@/components/dominion/experience/CinematicExperience";
 import Navbar from "@/components/dominion/Navbar";
 import Hero from "@/components/dominion/Hero";
-import { Highlights, Tracks, Venues, Contact, Footer } from "@/components/dominion/Sections";
+import { Highlights, Tracks, Sponsors, Venues, Contact, Footer } from "@/components/dominion/Sections";
 import RocketTimeline from "@/components/dominion/experience/RocketTimeline";
 
 export const Route = createFileRoute("/")({
@@ -54,6 +54,7 @@ function Index() {
         <Hero />
         <Highlights />
         <Tracks />
+        <Sponsors />
         <RocketTimeline />
         <Venues />
         <Contact />

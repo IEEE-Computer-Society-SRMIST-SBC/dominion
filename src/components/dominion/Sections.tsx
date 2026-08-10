@@ -133,6 +133,41 @@ export function Tracks() {
   );
 }
 
+export function Sponsors() {
+  return (
+    <section id="sponsors" className="relative border-y border-border py-24">
+      <div className="absolute inset-0 tech-grid opacity-20" />
+      <div className="relative mx-auto max-w-5xl px-6">
+        <SectionTitle kicker="Backed By" title="Sponsors" />
+        <motion.a
+          href="https://devfolio.co"
+          target="_blank"
+          rel="noreferrer"
+          {...reveal}
+          className="glass-panel-thor group gothic-arch relative mx-auto block max-w-2xl overflow-hidden p-8 text-center hover-loki-illusion"
+        >
+          <div
+            className="absolute -top-20 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full blur-3xl"
+            style={{ backgroundColor: "var(--color-thor)", opacity: 0.2 }}
+          />
+          <p
+            className="relative font-display text-[0.6rem] tracking-[0.3em] uppercase"
+            style={{ color: "var(--color-thor)" }}
+          >
+            Platform Partner
+          </p>
+          <h3 className="text-chrome relative mt-4 font-display text-3xl font-black tracking-[0.16em] uppercase">
+            Devfolio
+          </h3>
+          <p className="relative mt-4 text-sm text-muted-foreground">
+            Powering the official buildathon platform for registrations and submissions.
+          </p>
+        </motion.a>
+      </div>
+    </section>
+  );
+}
+
 
 
 export function Venues() {
