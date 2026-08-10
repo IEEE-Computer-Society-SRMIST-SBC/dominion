@@ -89,12 +89,11 @@ export default function Hero() {
           className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
           <a
-            id="register"
-            href="#contact"
+            href="#sponsors"
             className="group relative w-full overflow-hidden rounded-sm px-8 py-3.5 font-display text-[0.7rem] tracking-[0.28em] text-primary-foreground uppercase transition-all duration-500 hover:brightness-115 sm:w-auto"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </a>
           <a
             href="#tracks"

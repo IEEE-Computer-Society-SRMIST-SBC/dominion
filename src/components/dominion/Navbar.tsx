@@ -68,11 +68,11 @@ export default function Navbar() {
           <motion.a
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
-            href="#register"
+            href="#sponsors"
             className="hidden rounded-sm border border-primary/60 px-4 py-2 font-display text-[0.65rem] tracking-[0.22em] text-primary-foreground uppercase transition-shadow duration-500 sm:block"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </motion.a>
           <button
             aria-label="Toggle navigation"
@@ -97,12 +97,12 @@ export default function Navbar() {
             </a>
           ))}
           <a
-            href="#register"
+            href="#sponsors"
             onClick={() => setOpen(false)}
             className="mt-3 block rounded-sm px-4 py-2.5 text-center font-display text-[0.7rem] tracking-[0.22em] text-primary-foreground uppercase"
             style={{ background: "var(--gradient-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </a>
         </div>
       )}

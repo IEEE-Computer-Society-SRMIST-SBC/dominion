@@ -299,11 +299,11 @@ export function Contact() {
         </div>
         <motion.div {...reveal} className="mt-10 text-center">
           <a
-            href="#register"
+            href="#sponsors"
             className="inline-block rounded-sm px-10 py-4 font-display text-[0.7rem] tracking-[0.3em] text-primary-foreground uppercase"
             style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
           >
-            Register Now
+            Apply with Devfolio
           </a>
         </motion.div>
       </div>
