@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import CinematicExperience from "@/components/dominion/experience/CinematicExperience";
+import { Suspense, lazy, useEffect, useState } from "react";
 import Navbar from "@/components/dominion/Navbar";
 import Hero from "@/components/dominion/Hero";
 import {
@@ -11,7 +10,11 @@ import {
   Contact,
   Footer,
 } from "@/components/dominion/Sections";
-import RocketTimeline from "@/components/dominion/experience/RocketTimeline";
+
+const CinematicExperience = lazy(
+  () => import("@/components/dominion/experience/CinematicExperience")
+);
+const RocketTimeline = lazy(() => import("@/components/dominion/experience/RocketTimeline"));
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,13 +39,15 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [introDone, setIntroDone] = useState(false);
+  const [introDone, setIntroDone] = useState(true);
   const [showIntro, setShowIntro] = useState(false);
 
   useEffect(() => {
-    // Temporarily forcing intro to show on every reload for testing
-    setShowIntro(true);
-    // sessionStorage.setItem("dominion-intro", "1");
+    const hasSeenIntro = sessionStorage.getItem("dominion-intro") === "1";
+    if (!hasSeenIntro) {
+      setShowIntro(true);
+      setIntroDone(false);
+    }
 
     return () => {
       document.body.style.overflow = "";
@@ -50,19 +55,30 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = introDone ? "" : "hidden";
-  }, [introDone]);
+    const isIntroActive = showIntro && !introDone;
+    document.body.style.overflow = isIntroActive ? "hidden" : "";
+
+    if (showIntro && introDone) {
+      sessionStorage.setItem("dominion-intro", "1");
+    }
+  }, [introDone, showIntro]);
 
   return (
     <div className="min-h-screen bg-void">
-      {showIntro && !introDone && <CinematicExperience onComplete={() => setIntroDone(true)} />}
+      {showIntro && !introDone && (
+        <Suspense fallback={null}>
+          <CinematicExperience onComplete={() => setIntroDone(true)} />
+        </Suspense>
+      )}
       <Navbar />
       <main>
         <Hero />
         <Highlights />
         <Tracks />
         <Sponsors />
-        <RocketTimeline />
+        <Suspense fallback={null}>
+          <RocketTimeline />
+        </Suspense>
         <Venues />
         <Contact />
       </main>
