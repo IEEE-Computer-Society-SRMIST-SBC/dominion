@@ -65,10 +65,13 @@ export default function Navbar() {
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             href="#sponsors"
-            className="hidden rounded-sm border border-primary/60 px-4 py-2 font-display text-[0.65rem] tracking-[0.22em] text-primary-foreground uppercase transition-shadow duration-500 sm:block"
-            style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
+            className="hidden sm:block"
           >
-            Apply with Devfolio
+            <img
+              src="https://apply.devfolio.co/v2/badge.svg"
+              alt="Apply with Devfolio"
+              className="h-10 w-auto"
+            />
           </motion.a>
           <button
             aria-label="Toggle navigation"
@@ -92,13 +95,12 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <a
-            href="#sponsors"
-            onClick={() => setOpen(false)}
-            className="mt-3 block rounded-sm px-4 py-2.5 text-center font-display text-[0.7rem] tracking-[0.22em] text-primary-foreground uppercase"
-            style={{ background: "var(--gradient-emerald)" }}
-          >
-            Apply with Devfolio
+          <a href="#sponsors" onClick={() => setOpen(false)} className="mt-3 block">
+            <img
+              src="https://apply.devfolio.co/v2/badge.svg"
+              alt="Apply with Devfolio"
+              className="h-10 w-auto"
+            />
           </a>
         </div>
       )}
