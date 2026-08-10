@@ -45,11 +45,7 @@ export default function Navbar() {
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-border bg-void/70 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-1.5 overflow-hidden">
-          <img 
-            src="/logo.png" 
-            alt="Dominion" 
-            className="h-6 object-contain sm:h-8" 
-          />
+          <img src="/logo.png" alt="Dominion" className="h-6 object-contain sm:h-8" />
         </div>
 
         <nav className="hidden items-center gap-7 lg:flex">
