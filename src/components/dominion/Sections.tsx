@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import {
   Brain,
   CalendarDays,
@@ -165,15 +166,29 @@ export function Tracks() {
 }
 
 export function Sponsors() {
+  useEffect(() => {
+    const existing = document.querySelector('script[src="https://apply.devfolio.co/v2/sdk.js"]');
+    if (existing) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://apply.devfolio.co/v2/sdk.js";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <section id="sponsors" className="relative border-y border-border py-24">
       <div className="absolute inset-0 tech-grid opacity-20" />
       <div className="relative mx-auto max-w-5xl px-6">
         <SectionTitle kicker="Backed By" title="Sponsors" />
-        <motion.a
-          href="https://devfolio.co"
-          target="_blank"
-          rel="noreferrer"
+        <motion.div
           {...reveal}
           className="glass-panel-thor group gothic-arch relative mx-auto block max-w-2xl overflow-hidden p-8 text-center hover-loki-illusion"
         >
@@ -189,13 +204,19 @@ export function Sponsors() {
           </p>
           <img
             src="/Devfolio - White.png"
-            alt="Devfolio"
+            alt="DEVFOLIO LOGO"
             className="relative mx-auto mt-4 h-10 w-auto object-contain sm:h-12"
           />
           <p className="relative mt-4 text-sm text-muted-foreground">
             Powering the official buildathon platform for registrations and submissions.
           </p>
-        </motion.a>
+          <div
+            className="apply-button relative mx-auto mt-6"
+            data-hackathon-slug="dominion2026"
+            data-button-theme="light"
+            style={{ height: "44px", width: "312px" }}
+          />
+        </motion.div>
       </div>
     </section>
   );
