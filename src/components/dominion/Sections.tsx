@@ -187,9 +187,11 @@ export function Sponsors() {
           >
             Platform Partner
           </p>
-          <h3 className="text-chrome relative mt-4 font-display text-3xl font-black tracking-[0.16em] uppercase">
-            Devfolio
-          </h3>
+          <img
+            src="/Devfolio - White.png"
+            alt="Devfolio"
+            className="relative mx-auto mt-4 h-10 w-auto object-contain sm:h-12"
+          />
           <p className="relative mt-4 text-sm text-muted-foreground">
             Powering the official buildathon platform for registrations and submissions.
           </p>
