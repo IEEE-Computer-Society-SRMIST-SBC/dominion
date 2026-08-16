@@ -10,6 +10,16 @@ import {
   Phone,
   Lightbulb,
   Blocks,
+  Shield,
+  HeartHandshake,
+  Route,
+  Activity,
+  RefreshCw,
+  CloudLightning,
+  PawPrint,
+  Zap,
+  ScanFace,
+  Satellite,
 } from "lucide-react";
 
 const reveal = {
@@ -100,35 +110,89 @@ export function Highlights() {
 
 const tracks = [
   {
-    icon: Brain,
-    name: "AI / ML",
-    desc: "Train agents, ship intelligence. Models that reason, predict and command.",
+    name: "Defence & National Security",
+    desc: "Developing advanced tech to safeguard borders, military assets, and national sovereignty.",
+    icon: Shield,
+    color: "#ff2a2a",
   },
   {
-    icon: Blocks,
-    name: "Blockchain",
-    desc: "Trustless systems, on-chain sovereignty and decentralized authority.",
+    name: "Women Safety",
+    desc: "Creating rapid-response and preventative solutions for personal security.",
+    icon: HeartHandshake,
+    color: "#ff4d94",
   },
   {
-    icon: Cpu,
-    name: "Hardware / IoT",
-    desc: "Armored machines and sensor networks that bend the physical world.",
+    name: "Road & Transport Safety",
+    desc: "Innovating traffic intelligence and accident prevention systems.",
+    icon: Route,
+    color: "#ffb000",
   },
   {
-    icon: Lightbulb,
-    name: "Open Innovation",
-    desc: "No boundaries. Build the idea nobody dared to prototype yet.",
+    name: "Anti-Narcotics & Drug Intelligence",
+    desc: "Deploying data analytics to trace and dismantle illicit supply chains.",
+    icon: Activity,
+    color: "#b02aff",
+  },
+  {
+    name: "Rehabilitation & Reintegration",
+    desc: "Building systems to support the return of marginalized individuals to society.",
+    icon: RefreshCw,
+    color: "#2a8cff",
+  },
+  {
+    name: "Climate Resilience & Extreme Events",
+    desc: "Engineering solutions to predict, survive, and recover from environmental disasters.",
+    icon: CloudLightning,
+    color: "#2affea",
+  },
+  {
+    name: "Wildlife Protection & Anti-Poaching",
+    desc: "Leveraging sensors and AI to protect endangered species and habitats.",
+    icon: PawPrint,
+    color: "#00ff41",
+  },
+  {
+    name: "Critical Infrastructure & Blackout",
+    desc: "Securing power grids and vital facilities against physical and cyber threats.",
+    icon: Zap,
+    color: "#ffd700",
+  },
+  {
+    name: "Human Trafficking & Missing Persons",
+    desc: "Utilizing OSINT and facial recognition to locate and rescue victims.",
+    icon: ScanFace,
+    color: "#ff8c00",
+  },
+  {
+    name: "Space & Satellite Resilience",
+    desc: "Protecting orbital assets and securing satellite communication networks.",
+    icon: Satellite,
+    color: "#00e5ff",
   },
 ];
 
-
+const getTrackGridClass = (i: number) => {
+  switch (i) {
+    case 0: return "md:col-span-2 md:row-span-2 p-8";
+    case 1: return "md:col-span-2";
+    case 2: return "md:col-span-1";
+    case 3: return "md:col-span-1";
+    case 4: return "md:col-span-1";
+    case 5: return "md:col-span-1";
+    case 6: return "md:col-span-2 md:row-span-2 p-8";
+    case 7: return "md:col-span-2";
+    case 8: return "md:col-span-2";
+    case 9: return "md:col-span-2";
+    default: return "md:col-span-1";
+  }
+};
 
 export function Tracks() {
   return (
     <section id="tracks" className="relative py-24">
       <div className="mx-auto max-w-5xl px-6">
         <SectionTitle kicker="Hardware Uplink" title="Modules" />
-        <div className="grid grid-cols-1 md:grid-cols-4 md:grid-rows-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
           {tracks.map((t, i) => (
             <motion.div
               key={t.name}
@@ -140,11 +204,7 @@ export function Tracks() {
                 y: 3, 
                 boxShadow: "inset 2px 2px 8px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02), 2px 2px 5px rgba(0,0,0,0.5)" 
               }}
-              className={`group relative flex flex-col justify-between overflow-hidden rounded-lg p-6 cursor-pointer ${
-                i === 0 ? "md:col-span-2 md:row-span-2 p-8" :
-                i === 3 ? "md:col-span-2" :
-                "md:col-span-1"
-              }`}
+              className={`group relative flex flex-col justify-between overflow-hidden rounded-lg p-6 cursor-pointer ${getTrackGridClass(i)}`}
               style={{
                 background: "linear-gradient(145deg, #2a2d34 0%, #1c1e22 100%)",
                 borderTop: "2px solid #3e4149",
@@ -166,12 +226,12 @@ export function Tracks() {
 
               <div className="relative z-10 flex h-full flex-col justify-between">
                 <t.icon 
-                  className={`${i === 0 ? "mb-10 h-14 w-14" : "mb-8 h-8 w-8"}`} 
-                  style={{ color: "#ffb000", filter: "drop-shadow(0 0 8px #ffb000)" }}
+                  className={`${(i === 0 || i === 6) ? "mb-10 h-14 w-14" : "mb-8 h-8 w-8"}`} 
+                  style={{ color: t.color, filter: `drop-shadow(0 0 8px ${t.color})` }}
                 />
                 <div>
-                  <h3 className={`font-mono font-black tracking-widest text-[#e2e4e9] uppercase ${i === 0 ? "text-3xl" : "text-lg"}`} style={{ textShadow: "1px 1px 2px #000" }}>{t.name}</h3>
-                  <p className={`mt-3 font-mono leading-relaxed text-[#9ca3af] ${i === 0 ? "text-base" : "text-sm"}`}>{t.desc}</p>
+                  <h3 className={`font-mono font-black tracking-widest text-[#e2e4e9] uppercase ${(i === 0 || i === 6) ? "text-3xl" : "text-lg"}`} style={{ textShadow: "1px 1px 2px #000" }}>{t.name}</h3>
+                  <p className={`mt-3 font-mono leading-relaxed text-[#9ca3af] ${(i === 0 || i === 6) ? "text-base" : "text-sm"}`}>{t.desc}</p>
                 </div>
               </div>
             </motion.div>

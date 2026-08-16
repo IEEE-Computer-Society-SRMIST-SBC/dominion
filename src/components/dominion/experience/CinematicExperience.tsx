@@ -27,13 +27,13 @@ function CameraRig({ shakeRef }: { shakeRef: React.RefObject<number> }) {
       x: 0, y: 0.5, z: isMobile ? 9 : 7,
       duration: 3.0,
       ease: "expo.out",
-      delay: 4.05
+      delay: 4.15
     });
 
     // Reveal Drift (t = 4.5)
     gsap.to(basePos.current, {
       y: 2.5,
-      z: 8,
+      z: isMobile ? 10 : 8,
       duration: 6.0,
       ease: "power2.inOut",
       delay: 4.5
@@ -45,7 +45,7 @@ function CameraRig({ shakeRef }: { shakeRef: React.RefObject<number> }) {
       ease: "power2.inOut",
       delay: 4.5
     });
-  }, []);
+  }, [isMobile]);
 
   useFrame((_, delta) => {
     const shake = shakeRef.current ?? 0;
@@ -195,16 +195,23 @@ function SceneOrchestrator({
     // 1. Pop-in
     tl.to(g.scale, { x: 1, y: 1, z: 1, duration: 0.01 }, 0.05);
 
-    // 2. The Flight
+    // 2. The Flight (Takes 3.95s to get close)
     tl.to(g.position, {
-      x: 0, y: 0, z: 0,
-      duration: 4.0,
-      ease: "power3.in",
+      x: 0, y: 2, z: 0,
+      duration: 3.95,
+      ease: "power3.inOut",
     }, 0.05);
 
-    // 3. The Impact (t = 4.05s)
+    // 3. The Slam down (t = 4.00 to 4.15)
+    tl.to(g.position, {
+      y: -0.5, z: 1,
+      duration: 0.15,
+      ease: "power4.in",
+    }, 4.00);
+
+    // 4. The Impact Effects (t = 4.15s)
     tl.add(() => {
-      if (shakeRef) (shakeRef as React.MutableRefObject<number>).current = 1.8; 
+      if (shakeRef) (shakeRef as React.MutableRefObject<number>).current = 2.5; 
       explosionActive.current = true;
       trailActive.current = false;
       setShowCage(true);
@@ -213,20 +220,19 @@ function SceneOrchestrator({
         gsap.to(flashRef, { current: 1, duration: 0.05 }); 
         gsap.to(flashRef, { current: 0, duration: 1.2, delay: 0.1 }); 
       }
-    }, 4.05);
+    }, 4.15);
 
-    tl.to(g.scale, { x: 1.4, y: 1.4, z: 1.4, duration: 0.05, ease: "power4.out" }, 4.05);
-    tl.to(g.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 1.2, ease: "elastic.out(1, 0.2)" }, 4.10);
-    tl.to(g.position, { y: 0.3, z: -0.8, duration: 1.2, ease: "power3.out" }, 4.05);
-    tl.to(g.rotation, { x: -0.2, y: Math.PI * 0.2, z: 0.15, duration: 1.5, ease: "power3.out" }, 4.05);
+    tl.to(g.scale, { x: 1.4, y: 1.4, z: 1.4, duration: 0.05, ease: "power4.out" }, 4.15);
+    tl.to(g.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 1.2, ease: "elastic.out(1, 0.2)" }, 4.20);
+    tl.to(g.rotation, { x: -0.2, y: Math.PI * 0.2, z: 0.15, duration: 1.5, ease: "power3.out" }, 4.15);
 
-    // 4. Fade text out fast right before shatter
-    tl.to(textMatRef.current, { opacity: 0, duration: 0.2 }, 4.4); 
+    // 5. Fade text out fast right before shatter
+    tl.to(textMatRef.current, { opacity: 0, duration: 0.1 }, 4.05); 
     
-    // 5. Trigger the screen shatter at exactly 4.6s in the timeline
+    // 6. Trigger the screen shatter at exactly the moment of impact (4.15s)
     tl.add(() => {
       if (onShatter) onShatter();
-    }, 4.6);
+    }, 4.15);
 
     // Note: The hammer stays on screen! The background shattering handles the exit.
   }, []);
