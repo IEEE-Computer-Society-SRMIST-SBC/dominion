@@ -36,27 +36,29 @@ function LogoMark({ label }: { label: string }) {
       {initials}
     </span>
   );
-function DevfolioButton({ theme = "dark" }: { theme?: "light" | "dark" | "dark-inverted" }) {
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://apply.devfolio.co/v2/sdk.js";
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
+}
 
+function DevfolioButton({ theme = "dark" }: { theme?: "light" | "dark" | "dark-inverted" }) {
+  // Use a custom styled anchor tag to bypass iframe security issues on localhost
+  // which were causing the white backdrop error screen.
   return (
-    <div
-      className="apply-button"
-      data-hackathon-slug="dominion2026"
-      data-button-theme={theme}
+    <a
+      href="https://dominion2026.devfolio.co/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-center gap-2 rounded bg-[#272727] text-white hover:bg-[#333333] transition-colors border border-[#444]"
       style={{ height: "44px", width: "312px" }}
-    ></div>
+    >
+      <svg
+        className="h-6 w-6"
+        viewBox="0 0 115.46 42.36"
+        fill="#3770FF"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M115.46 21.18A21.18 21.18 0 1 1 94.28 0a21.18 21.18 0 0 1 21.18 21.18zM94.28 7.37a13.81 13.81 0 1 0 13.81 13.81 13.81 13.81 0 0 0-13.81-13.81zM94.28 14.73a6.45 6.45 0 1 0 6.45 6.45 6.45 6.45 0 0 0-6.45-6.45z" />
+      </svg>
+      <span className="font-semibold text-[18px]">Apply with Devfolio</span>
+    </a>
   );
 }
 
