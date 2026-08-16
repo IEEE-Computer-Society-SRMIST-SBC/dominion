@@ -46,24 +46,6 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pt-28 pb-20 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="mb-8 flex flex-wrap justify-center items-center gap-6 sm:gap-8"
-        >
-          <img src="/srmlogo.png" alt="SRM" className="h-12 sm:h-20 object-contain" />
-          <img
-            src="/soclogo.png"
-            alt="School of Computing"
-            className="h-12 sm:h-20 object-contain"
-          />
-          <img src="/cintellogo.png" alt="Cintel" className="h-12 sm:h-16 object-contain" />
-          <img src="/ctechlogo.png" alt="CTECH" className="h-12 sm:h-20 object-contain" />
-          <img src="/hrcclogo.png" alt="HRCC" className="h-6 sm:h-8 object-contain" />
-          <img src="/ieeecslogo.png" alt="IEEE CS" className="h-20 sm:h-28 object-contain" />
-        </motion.div>
-
         {/* Title inside Energy Chamber */}
         <div className="relative mx-auto mt-12 sm:mt-16 w-full max-w-[600px] sm:max-w-[800px] z-10 flex justify-center">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[150%] bg-[radial-gradient(ellipse_at_center,_rgba(0,230,138,0.15)_0%,_transparent_70%)] blur-2xl pointer-events-none" />

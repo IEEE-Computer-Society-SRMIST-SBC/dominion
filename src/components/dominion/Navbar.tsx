@@ -36,6 +36,8 @@ function LogoMark({ label }: { label: string }) {
       {initials}
     </span>
   );
+}
+
 function DevfolioButton({ theme = "dark" }: { theme?: "light" | "dark" | "dark-inverted" }) {
   useEffect(() => {
     const script = document.createElement("script");
@@ -65,7 +67,7 @@ export default function Navbar() {
 
   return (
     <header 
-      className="fixed top-2 right-2 left-2 sm:top-4 sm:right-4 sm:left-4 z-50 overflow-hidden rounded-lg"
+      className="absolute top-2 right-2 left-2 sm:top-4 sm:right-4 sm:left-4 z-50 overflow-hidden rounded-lg"
       style={{
         background: "linear-gradient(180deg, #16181b 0%, #0B1210 100%)",
         borderTop: "1px solid #3e4149",

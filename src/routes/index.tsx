@@ -6,6 +6,7 @@ import {
   Highlights,
   Tracks,
   Sponsors,
+  Partners,
   Venues,
   Contact,
   Footer,
@@ -76,6 +77,7 @@ function Index() {
         <Highlights />
         <Tracks />
         <Sponsors />
+        <Partners />
         <Suspense fallback={null}>
           <RocketTimeline />
         </Suspense>
