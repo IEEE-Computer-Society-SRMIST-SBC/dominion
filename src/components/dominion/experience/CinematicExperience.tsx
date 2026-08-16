@@ -193,21 +193,22 @@ function SceneOrchestrator({
     const tl = gsap.timeline();
 
     // 1. Pop-in
-    tl.to(g.scale, { x: 1, y: 1, z: 1, duration: 0.01 }, 0.05);
+    tl.to(g.scale, { x: 1.5, y: 1.5, z: 1.5, duration: 0.01 }, 0.05);
 
-    // 2. The Flight (Takes 3.95s to get close)
+    // 2. The Flight (Takes 4.1s to hit the screen)
     tl.to(g.position, {
-      x: 0, y: 2, z: 0,
-      duration: 3.95,
-      ease: "power3.inOut",
+      x: 0, y: 0, z: 2.5, // Reach the screen
+      duration: 4.1,
+      ease: "power3.in",
     }, 0.05);
-
-    // 3. The Slam down (t = 4.00 to 4.15)
-    tl.to(g.position, {
-      y: -0.5, z: 1,
-      duration: 0.15,
-      ease: "power4.in",
-    }, 4.00);
+    
+    tl.to(g.rotation, {
+      x: Math.PI * -4, // Spin wildly
+      y: Math.PI * 2,
+      z: 0,
+      duration: 4.1,
+      ease: "power2.in",
+    }, 0.05);
 
     // 4. The Impact Effects (t = 4.15s)
     tl.add(() => {
@@ -222,9 +223,20 @@ function SceneOrchestrator({
       }
     }, 4.15);
 
-    tl.to(g.scale, { x: 1.4, y: 1.4, z: 1.4, duration: 0.05, ease: "power4.out" }, 4.15);
-    tl.to(g.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 1.2, ease: "elastic.out(1, 0.2)" }, 4.20);
-    tl.to(g.rotation, { x: -0.2, y: Math.PI * 0.2, z: 0.15, duration: 1.5, ease: "power3.out" }, 4.15);
+    // Fly away past the camera!
+    tl.to(g.position, {
+      x: -5, y: 5, z: 15,
+      duration: 1.5,
+      ease: "power2.out",
+    }, 4.15);
+    
+    tl.to(g.rotation, {
+      x: Math.PI * -6,
+      y: Math.PI * 4,
+      z: Math.PI,
+      duration: 1.5,
+      ease: "power2.out",
+    }, 4.15);
 
     // 5. Fade text out fast right before shatter
     tl.to(textMatRef.current, { opacity: 0, duration: 0.1 }, 4.05); 
@@ -234,7 +246,7 @@ function SceneOrchestrator({
       if (onShatter) onShatter();
     }, 4.15);
 
-    // Note: The hammer stays on screen! The background shattering handles the exit.
+    // Note: The hammer flies past the screen!
   }, []);
 
   useFrame(({ clock }) => {
@@ -344,12 +356,12 @@ export default function CinematicExperience({ onComplete }: { onComplete: () => 
             ))
           )}
 
-          {/* Canvas (Transparent) - Hammer drops along with the glass! */}
+          {/* Canvas (Transparent) - Hammer flies past! */}
           <motion.div
             className="absolute inset-0"
-            initial={{ y: 0, opacity: 1, scale: 1 }}
-            animate={shattered ? { y: 1000, opacity: 0, rotate: 5, scale: 0.9 } : { y: 0, opacity: 1, scale: 1 }}
-            transition={{ duration: 3.5, ease: [0.42, 0, 1, 1] }} // Slow motion easeIn
+            initial={{ opacity: 1 }}
+            animate={shattered ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: 1.5, delay: 1.0 }} // Fade out scene shortly after impact
           >
             <Canvas gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}>
               <fogExp2 attach="fog" args={["#020305", 0.04]} />
