@@ -70,26 +70,36 @@ function ArmoredCore() {
 
   return (
     <group>
+      {/* Containment Field */}
+      <mesh>
+        <cylinderGeometry args={[4.5, 4.5, 12, 32, 1, true]} />
+        <meshBasicMaterial color="#00E68A" transparent opacity={0.02} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+      <mesh>
+        <cylinderGeometry args={[4.6, 4.6, 12, 16, 1, true]} />
+        <meshBasicMaterial color="#00FF9A" wireframe transparent opacity={0.05} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+
       <Icosahedron ref={wire} args={[3.1, 1]}>
-        <meshBasicMaterial color="#00a83f" wireframe transparent opacity={0.35} />
+        <meshBasicMaterial color="#00E68A" wireframe transparent opacity={0.2} />
       </Icosahedron>
 
       <Float speed={1.1} rotationIntensity={0.6} floatIntensity={0.8}>
         <Icosahedron args={[1.05, 0]}>
           <meshStandardMaterial
-            color="#3c443f"
-            metalness={0.95}
-            roughness={0.42}
+            color="#050908"
+            metalness={1.0}
+            roughness={0.15}
             flatShading
-            emissive="#00a83f"
-            emissiveIntensity={0.05}
+            emissive="#00E68A"
+            emissiveIntensity={0.1}
           />
         </Icosahedron>
       </Float>
 
       <Float speed={0.8} rotationIntensity={1.1} floatIntensity={1.2}>
         <TorusKnot args={[0.7, 0.16, 160, 24]} position={[3.6, 1.3, -1.5]}>
-          <meshStandardMaterial color="#c9d1cc" metalness={1} roughness={0.12} />
+          <meshStandardMaterial color="#0B1210" metalness={1} roughness={0.1} emissive="#00FF9A" emissiveIntensity={0.05} />
         </TorusKnot>
       </Float>
 
@@ -97,11 +107,11 @@ function ArmoredCore() {
         <mesh position={[-3.9, -1.4, -1]} rotation={[0.4, 0.8, 0.2]}>
           <octahedronGeometry args={[0.85, 0]} />
           <meshStandardMaterial
-            color="#5f6b64"
-            metalness={1}
-            roughness={0.25}
-            emissive="#00ff87"
-            emissiveIntensity={0.25}
+            color="#121C19"
+            metalness={0.9}
+            roughness={0.2}
+            emissive="#00FF9A"
+            emissiveIntensity={0.3}
           />
         </mesh>
       </Float>
@@ -109,7 +119,7 @@ function ArmoredCore() {
       <Float speed={0.9} rotationIntensity={0.5} floatIntensity={0.9}>
         <mesh position={[2.4, -2.1, 1.2]} rotation={[0.9, 0.2, 0.5]}>
           <boxGeometry args={[0.7, 0.7, 0.7]} />
-          <meshStandardMaterial color="#8a918d" metalness={1} roughness={0.3} />
+          <meshStandardMaterial color="#050908" metalness={1} roughness={0.25} emissive="#00E68A" emissiveIntensity={0.1} />
         </mesh>
       </Float>
     </group>
@@ -123,11 +133,12 @@ export default function HeroScene() {
       gl={{ antialias: true, alpha: true }}
       camera={{ position: [0, 0, 9], fov: 45 }}
     >
-      <fog attach="fog" args={["#050807", 8, 20]} />
-      <ambientLight intensity={0.25} />
-      <directionalLight position={[5, 6, 5]} intensity={1.1} color="#d8f5e5" />
-      <pointLight position={[-6, -2, 3]} intensity={14} color="#00a83f" distance={20} />
-      <pointLight position={[4, 3, -4]} intensity={12} color="#00ff87" distance={18} />
+      <fog attach="fog" args={["#030807", 8, 20]} />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[5, 6, 5]} intensity={1.5} color="#E8ECE9" />
+      <pointLight position={[0, 0, 0]} intensity={30} color="#00E68A" distance={10} />
+      <pointLight position={[-6, -2, 3]} intensity={18} color="#00FF9A" distance={20} />
+      <pointLight position={[4, 3, -4]} intensity={15} color="#00E68A" distance={18} />
       <Rig>
         <ArmoredCore />
       </Rig>

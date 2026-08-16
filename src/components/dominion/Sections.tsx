@@ -279,22 +279,6 @@ export function Sponsors() {
             </p>
           </div>
           
-          {/* Recessed Button Chamber */}
-          <div 
-            className="shrink-0 p-4 rounded-lg border-2 border-[#111] bg-[#050608]"
-            style={{ boxShadow: "inset 5px 5px 15px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02)" }}
-          >
-            <div className="mb-3 flex items-center justify-between">
-              <span className="font-mono text-[0.55rem] tracking-widest text-[#ff2a2a] uppercase">Authorize</span>
-              <div className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: "#ff2a2a", boxShadow: "0 0 8px #ff2a2a" }} />
-            </div>
-            <div
-              className="apply-button relative"
-              data-hackathon-slug="dominion2026"
-              data-button-theme="dark"
-              style={{ height: "44px", width: "312px" }}
-            />
-          </div>
         </motion.div>
       </div>
     </section>
@@ -325,17 +309,39 @@ export function Venues() {
               key={v.tag}
               {...reveal}
               transition={{ ...reveal.transition, delay: i * 0.1 }}
-              className="glass-panel armor-surface relative overflow-hidden p-8"
+              className="group relative overflow-hidden rounded-lg p-8 cursor-pointer"
+              whileHover={{ 
+                y: 3, 
+                boxShadow: "inset 2px 2px 8px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02), 2px 2px 5px rgba(0,0,0,0.5)" 
+              }}
+              style={{
+                background: "linear-gradient(145deg, #2a2d34 0%, #1c1e22 100%)",
+                borderTop: "2px solid #3e4149",
+                borderLeft: "2px solid #3e4149",
+                borderBottom: "2px solid #0c0d10",
+                borderRight: "2px solid #0c0d10",
+                boxShadow: "8px 8px 18px rgba(0,0,0,0.9), -2px -2px 10px rgba(255,255,255,0.03), inset 1px 1px 2px rgba(255,255,255,0.1), inset -1px -1px 2px rgba(0,0,0,0.6)",
+              }}
             >
-              <div className="animate-float-slow absolute -top-16 -right-16 h-40 w-40 rounded-full bg-primary/15 blur-3xl" />
-              <span className="relative inline-block rounded-sm border border-primary/40 px-2.5 py-1 font-display text-[0.55rem] tracking-[0.3em] text-primary uppercase">
-                {v.tag}
-              </span>
-              <v.icon className="relative mt-6 h-7 w-7 text-accent" strokeWidth={1.4} />
-              <h3 className="text-chrome relative mt-4 font-display text-lg leading-snug font-bold tracking-[0.08em] uppercase">
-                {v.title}
-              </h3>
-              <p className="relative mt-2 text-sm text-muted-foreground">{v.sub}</p>
+              <div className="absolute top-3 left-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute top-3 right-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-3 left-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-3 right-3 h-2 w-2 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              
+              <div className="absolute right-0 top-0 -mr-6 -mt-6 opacity-5 mix-blend-overlay">
+                <v.icon className="h-48 w-48" />
+              </div>
+
+              <div className="relative z-10">
+                <span className="inline-block rounded-sm border border-[#444] bg-[#0c0d10] px-2.5 py-1 font-mono text-[0.55rem] tracking-[0.3em] text-primary uppercase shadow-[inset_1px_1px_3px_rgba(0,0,0,0.9)]">
+                  {v.tag}
+                </span>
+                <v.icon className="mt-6 h-8 w-8 text-primary" style={{ filter: "drop-shadow(0 0 5px var(--primary))" }} />
+                <h3 className="text-[#e2e4e9] mt-4 font-mono text-lg font-black tracking-widest uppercase" style={{ textShadow: "1px 1px 2px #000" }}>
+                  {v.title}
+                </h3>
+                <p className="mt-2 font-mono text-sm leading-relaxed text-[#9ca3af]">{v.sub}</p>
+              </div>
             </motion.div>
           ))}
         </div>
@@ -362,29 +368,37 @@ export function Contact() {
               href={`tel:+91${o.phone.replace(/\s/g, "")}`}
               {...reveal}
               transition={{ ...reveal.transition, delay: i * 0.1 }}
-              className="glass-panel flex items-center gap-4 p-6"
+              className="group relative overflow-hidden rounded-lg p-6 flex items-center gap-4 cursor-pointer"
+              whileHover={{ 
+                y: 3, 
+                boxShadow: "inset 2px 2px 8px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02), 2px 2px 5px rgba(0,0,0,0.5)" 
+              }}
+              style={{
+                background: "linear-gradient(145deg, #2a2d34 0%, #1c1e22 100%)",
+                borderTop: "2px solid #3e4149",
+                borderLeft: "2px solid #3e4149",
+                borderBottom: "2px solid #0c0d10",
+                borderRight: "2px solid #0c0d10",
+                boxShadow: "8px 8px 18px rgba(0,0,0,0.9), -2px -2px 10px rgba(255,255,255,0.03), inset 1px 1px 2px rgba(255,255,255,0.1), inset -1px -1px 2px rgba(0,0,0,0.6)",
+              }}
             >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-primary/40 bg-primary/10">
-                <Phone className="h-4 w-4 text-accent" />
+              <div className="absolute top-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+              <div className="absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+
+              <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded border border-[#444] bg-[#0c0d10] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.9)]">
+                <Phone className="h-4 w-4 text-primary" style={{ filter: "drop-shadow(0 0 5px var(--primary))" }} />
               </span>
-              <span>
-                <span className="text-chrome block font-display text-sm tracking-[0.2em] uppercase">
+              <span className="relative z-10">
+                <span className="text-[#e2e4e9] block font-mono font-black text-sm tracking-widest uppercase" style={{ textShadow: "1px 1px 2px #000" }}>
                   {o.name}
                 </span>
-                <span className="mt-1 block text-sm text-muted-foreground">+91 {o.phone}</span>
+                <span className="mt-1 block font-mono text-xs text-[#9ca3af]">+91 {o.phone}</span>
               </span>
             </motion.a>
           ))}
         </div>
-        <motion.div {...reveal} className="mt-10 text-center">
-          <a
-            href="#sponsors"
-            className="inline-block rounded-sm px-10 py-4 font-display text-[0.7rem] tracking-[0.3em] text-primary-foreground uppercase"
-            style={{ background: "var(--gradient-emerald)", boxShadow: "var(--glow-emerald)" }}
-          >
-            Apply with Devfolio
-          </a>
-        </motion.div>
       </div>
     </section>
   );

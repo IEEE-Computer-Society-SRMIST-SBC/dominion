@@ -248,7 +248,9 @@ export default function RocketTimeline() {
         {/* 3D Canvas */}
         <div className="absolute inset-0 z-0">
           <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-            <Scene scrollY={scrollYProgress} activeMilestone={active} />
+            <React.Suspense fallback={null}>
+              <Scene scrollY={scrollYProgress} activeMilestone={active} />
+            </React.Suspense>
           </Canvas>
         </div>
 
@@ -257,22 +259,23 @@ export default function RocketTimeline() {
           
           {/* Left Side: Trajectory & Milestones */}
           <div className="relative w-[90%] md:w-1/2 h-full flex flex-col justify-center pl-6 sm:pl-10 md:pl-24">
-            {/* Glowing Trajectory Line */}
-            <div className="absolute left-[23px] sm:left-[39px] md:left-[95px] top-0 bottom-0 w-[2px] bg-[#0A3D29]">
+            
+            {/* Illuminated Energy Conduit (Metallic Rail) */}
+            <div className="absolute left-[32px] sm:left-[48px] md:left-[104px] top-0 bottom-0 w-[8px] rounded-full border-x border-[#0c0d10] bg-[#111317] shadow-[inset_1px_1px_4px_rgba(0,0,0,0.9),0_0_5px_rgba(0,0,0,0.5)] overflow-hidden">
               <motion.div 
-                className="w-full bg-[#01E864] origin-top"
+                className="w-full bg-[#01E864] origin-top opacity-80"
                 style={{ 
                   height: "100%", 
                   scaleY: useTransform(scrollYProgress, [0, 0.9], [0, 1]),
-                  boxShadow: "0 0 10px #01E864"
+                  boxShadow: "0 0 15px #01E864, inset 0 0 5px #ffffff"
                 }}
               />
             </div>
 
             {/* Initial State text (top) */}
             <motion.div 
-              className="absolute top-10 left-6 sm:left-10 md:left-24 font-display text-[0.6rem] tracking-[0.2em] text-[#01E864]"
-              style={{ opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]) }}
+              className="absolute top-10 left-6 sm:left-10 md:left-24 font-mono text-[0.6rem] font-bold tracking-[0.2em] text-[#01E864]"
+              style={{ opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]), textShadow: "0 0 8px rgba(1,232,100,0.5)" }}
             >
               <p>T−00:00:00</p>
               <p>SYSTEMS ONLINE</p>
@@ -284,30 +287,69 @@ export default function RocketTimeline() {
                 const isPassed = active > i;
                 return (
                   <div key={m.num} className="relative flex items-center gap-6">
-                    {/* HUD Target Node */}
-                    <div className="relative z-10 flex h-4 w-4 shrink-0 items-center justify-center">
-                      <div className={`absolute h-full w-full border transition-colors duration-300 ${isActive || isPassed ? "border-[#01E864]" : "border-[#0A3D29]"}`} style={{ transform: "rotate(45deg)" }} />
-                      {isActive && <div className="absolute h-2 w-2 bg-[#01E864]" style={{ transform: "rotate(45deg)", boxShadow: "0 0 10px #01E864" }} />}
+                    
+                    {/* Tactile Mechanical Indicator */}
+                    <div 
+                      className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-500 ${
+                        isActive || isPassed 
+                          ? "border-[#01E864] bg-[#0c1811] shadow-[0_0_15px_rgba(1,232,100,0.4),inset_0_0_8px_rgba(1,232,100,0.4)]" 
+                          : "border-[#2a2d34] bg-[#1c1e22] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.8),1px_1px_2px_rgba(255,255,255,0.05)]"
+                      }`}
+                    >
+                      <div className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
+                        isActive 
+                          ? "bg-[#01E864] shadow-[0_0_10px_#01E864,inset_1px_1px_2px_#ffffff]" 
+                          : isPassed 
+                            ? "bg-[#0A3D29]"
+                            : "bg-[#111317] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"
+                      }`} />
                     </div>
 
                     {/* Milestone Card */}
                     <motion.div 
-                      className={`relative font-display uppercase transition-all duration-500 ${isActive ? "opacity-100" : "opacity-30"}`}
+                      className={`relative font-display uppercase transition-all duration-500 ${isActive ? "opacity-100" : "opacity-40"}`}
                       initial={{ x: -20 }}
                       animate={{ x: isActive ? 0 : -10 }}
                     >
-                      <p className={`text-[0.6rem] tracking-[0.3em] ${isActive ? "text-[#01E864]" : "text-[#6F8F7D]"}`}>
+                      <p 
+                        className={`text-[0.65rem] font-bold tracking-[0.35em] ${isActive ? "text-[#01E864]" : "text-[#5b6860]"}`}
+                        style={{ textShadow: isActive ? "0 0 8px rgba(1,232,100,0.4)" : "1px 1px 1px rgba(0,0,0,0.8)" }}
+                      >
                         {m.num} — {m.title}
                       </p>
+                      
                       {isActive && (
                         <motion.div 
-                          initial={{ opacity: 0, y: 10 }} 
-                          animate={{ opacity: 1, y: 0 }} 
-                          className="mt-3 border border-[#01E864]/40 bg-[#006B35]/20 p-4 backdrop-blur-sm"
-                          style={{ boxShadow: "0 0 20px rgba(1, 232, 100, 0.1)" }}
+                          initial={{ opacity: 0, scale: 0.95 }} 
+                          animate={{ opacity: 1, scale: 1 }} 
+                          className="mt-4 relative overflow-hidden rounded-lg p-5 flex flex-col gap-2"
+                          style={{ 
+                            background: "linear-gradient(145deg, #181d1a 0%, #0d120f 100%)",
+                            borderTop: "2px solid #2a352e",
+                            borderLeft: "2px solid #2a352e",
+                            borderBottom: "2px solid #050806",
+                            borderRight: "2px solid #050806",
+                            boxShadow: "10px 10px 20px rgba(0,0,0,0.9), -1px -1px 5px rgba(255,255,255,0.02), inset 1px 1px 2px rgba(1,232,100,0.1), inset -1px -1px 5px rgba(0,0,0,0.8), 0 0 30px rgba(1,232,100,0.05)"
+                          }}
                         >
-                          <p className="text-sm tracking-widest text-[#E8FFF2]">{m.desc}</p>
-                          <p className="mt-2 text-[0.55rem] tracking-[0.2em] text-[#01E864]">{m.date}</p>
+                          {/* Hardware Screws */}
+                          <div className="absolute top-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+                          <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+                          <div className="absolute bottom-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+                          <div className="absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+
+                          {/* Recessed Screen */}
+                          <div className="relative mt-2 p-4 rounded bg-[#030604] border border-[#111]" style={{ boxShadow: "inset 3px 3px 10px rgba(0,0,0,0.9), inset -1px -1px 2px rgba(255,255,255,0.03)" }}>
+                            <div className="absolute inset-0 bg-[linear-gradient(rgba(1,232,100,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(1,232,100,0.03)_1px,transparent_1px)] bg-[size:4px_4px] pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
+                            
+                            <div className="mb-3 flex items-center justify-between">
+                              <span className="font-mono text-[0.55rem] tracking-[0.2em] text-[#01E864] uppercase opacity-70">● SYSTEM ACTIVE</span>
+                            </div>
+                            
+                            <p className="font-display text-lg tracking-widest text-[#E8FFF2]" style={{ textShadow: "0 0 10px rgba(1,232,100,0.5)" }}>{m.desc}</p>
+                            <p className="mt-2 font-mono text-[0.65rem] font-bold tracking-[0.25em] text-[#01E864]">{m.date}</p>
+                          </div>
                         </motion.div>
                       )}
                     </motion.div>
@@ -318,31 +360,7 @@ export default function RocketTimeline() {
           </div>
         </div>
 
-        {/* Breakthrough Flash */}
-        <motion.div 
-          className="absolute inset-0 z-40 bg-white"
-          style={{ opacity: flashOpacity }}
-        />
 
-        {/* Final Screen */}
-        <motion.div 
-          className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#030807] text-center"
-          style={{ opacity: endScreenOpacity, pointerEvents: active === 5 ? "auto" : "none" }}
-        >
-          <img src="/logo.png" alt="Dominion" className="mb-10 h-12 sm:h-16 object-contain" />
-          <h2 className="font-display text-2xl sm:text-5xl font-black tracking-[0.1em] text-[#E8FFF2] leading-tight">
-            THE FUTURE<br/>BELONGS TO<br/>THOSE WHO BUILD.
-          </h2>
-          <motion.a 
-            href="#register"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-16 pointer-events-auto border border-[#01E864] px-8 py-4 font-display text-sm tracking-[0.3em] text-[#01E864] transition-colors hover:bg-[#01E864] hover:text-[#030807]"
-            style={{ boxShadow: "0 0 20px rgba(1, 232, 100, 0.2)" }}
-          >
-            [ ENTER ]
-          </motion.a>
-        </motion.div>
 
       </div>
     </section>
