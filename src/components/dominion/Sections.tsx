@@ -285,6 +285,185 @@ export function Sponsors() {
   );
 }
 
+/*
+ * `cap` is each logo's max height as a % of the key well, tuned per logo so the
+ * marks read at the same optical weight despite very different aspect ratios
+ * (a squarish mark at the same height looks far heavier than a wide lockup).
+ * Derived as height ∝ 1/sqrt(aspect), then clamped so neither the near-square
+ * CINTEL mark nor the ultra-wide CMU lockup dominates its neighbours.
+ */
+const nationalPartners = [
+  { src: "/srmlogo.png", alt: "SRM Institute of Science and Technology", code: "SRMIST", cap: 46 },
+  { src: "/soclogo.png", alt: "School of Computing", code: "SOC", cap: 54 },
+  { src: "/cintellogo.png", alt: "Department of Computational Intelligence", code: "CINTEL", cap: 65 },
+  { src: "/ctechlogo.png", alt: "Department of Computing Technologies", code: "C-TECH", cap: 51 },
+  { src: "/hrcclogo.png", alt: "HackerRank Campus Crew SRMIST", code: "HRCC", cap: 61 },
+  { src: "/ieeecslogo.png", alt: "IEEE Computer Society", code: "IEEE CS", cap: 42 },
+];
+
+const internationalPartners = [
+  { src: "/partners/cmu-africa.png", alt: "Carnegie Mellon University Africa IEEE Student Branch", code: "CMU Africa", cap: 33 },
+  { src: "/partners/dedan-kimathi.png", alt: "Dedan Kimathi University IEEE Student Branch", code: "DeKUT", cap: 62 },
+  { src: "/partners/ernest-cook.png", alt: "Ernest Cook University IEEE Student Branch", code: "Ernest Cook", cap: 48 },
+  { src: "/partners/makerere.png", alt: "Makerere University IEEE Student Branch", code: "Makerere", cap: 48 },
+  { src: "/partners/mbarara.png", alt: "Mbarara University IEEE Student Branch", code: "Mbarara", cap: 47 },
+  { src: "/partners/ndejje.png", alt: "Ndejje University IEEE Student Branch", code: "Ndejje", cap: 48 },
+  { src: "/partners/university-of-rwanda.png", alt: "University of Rwanda IEEE Student Branch", code: "U. Rwanda", cap: 49 },
+];
+
+/* Panel fastener — sits at the console housing corners */
+function Screw({ className }: { className: string }) {
+  return (
+    <div
+      className={`absolute h-2.5 w-2.5 rounded-full ${className}`}
+      style={{
+        background: "radial-gradient(circle at 32% 30%, #4a4f57 0%, #23272d 55%, #14171b 100%)",
+        boxShadow: "inset 0 1px 1px rgba(255,255,255,0.25), 0 1px 2px rgba(0,0,0,0.9)",
+      }}
+    >
+      <div className="absolute top-1/2 left-1/2 h-[1px] w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#0b0d10]" />
+    </div>
+  );
+}
+
+/* One logo as a physical, pressable console key */
+function PartnerKey({
+  partner,
+  tone,
+  index,
+}: {
+  partner: { src: string; alt: string; code: string; cap: number };
+  tone: "dark" | "light";
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      className="group"
+    >
+      <div
+        className="relative rounded-lg p-1.5 transition-transform duration-150 group-hover:translate-y-[2px] group-active:translate-y-[3px]"
+        style={{
+          background: "linear-gradient(145deg, #262a30 0%, #12151a 100%)",
+          borderTop: "1px solid #3e4149",
+          borderLeft: "1px solid #3e4149",
+          borderBottom: "3px solid #06070a",
+          borderRight: "3px solid #06070a",
+          boxShadow: "0 14px 26px rgba(0,0,0,0.85), inset 1px 1px 2px rgba(255,255,255,0.1)",
+        }}
+      >
+        {/* Status LED — idles dim, lights on hover */}
+        <span className="absolute top-2 right-2 z-10 h-1.5 w-1.5 rounded-full bg-[#00E68A] opacity-30 shadow-[0_0_6px_#00E68A] transition-opacity duration-300 group-hover:opacity-100" />
+
+        {/* Recessed well holding the logo */}
+        <div
+          className="flex h-20 w-40 items-center justify-center rounded px-3 sm:h-24 sm:w-52"
+          style={
+            tone === "light"
+              ? {
+                  /* Flat white: these logos ship an opaque white background, so any
+                     tint would show as a hard-edged white rectangle around each mark. */
+                  background: "#FFFFFF",
+                  boxShadow: "inset 0 2px 6px rgba(0,0,0,0.28)",
+                }
+              : {
+                  background: "linear-gradient(160deg, #0A1A12 0%, #050908 100%)",
+                  boxShadow: "inset 2px 2px 10px rgba(0,0,0,0.9)",
+                }
+          }
+        >
+          <img
+            src={partner.src}
+            alt={partner.alt}
+            loading="lazy"
+            className="w-auto max-w-full object-contain"
+            style={{ maxHeight: `${partner.cap}%` }}
+          />
+        </div>
+
+        {/* Green illumination on hover */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          style={{ boxShadow: "inset 0 0 18px rgba(0,230,138,0.35)" }}
+        />
+      </div>
+
+      <p className="mt-2.5 text-center font-mono text-[0.5rem] tracking-[0.25em] text-[#7a8190] uppercase transition-colors group-hover:text-[#00E68A]">
+        {partner.code}
+      </p>
+    </motion.div>
+  );
+}
+
+/* Engraved legend above each bank of keys */
+function BankLabel({ children }: { children: string }) {
+  return (
+    <div className="mb-7 flex items-center gap-3">
+      <span className="h-1.5 w-1.5 rotate-45 bg-[#00E68A] shadow-[0_0_6px_#00E68A]" />
+      <p
+        className="font-mono text-[0.6rem] font-bold tracking-[0.35em] text-[#9ca3af] uppercase"
+        style={{ textShadow: "0 1px 0 rgba(0,0,0,0.9)" }}
+      >
+        {children}
+      </p>
+      <div className="h-[1px] flex-1 bg-gradient-to-r from-[#33373e] to-transparent" />
+    </div>
+  );
+}
+
+export function Partners() {
+  return (
+    <section id="partners" className="relative py-24">
+      <div className="absolute inset-0 tech-grid opacity-20" />
+      <div className="relative mx-auto max-w-6xl px-6">
+        <SectionTitle kicker="Allied Fleet" title="Partners" />
+
+        <motion.div
+          {...reveal}
+          className="relative mx-auto overflow-hidden rounded-xl p-8 sm:p-10"
+          style={{
+            background: "linear-gradient(145deg, #1f2126 0%, #141619 100%)",
+            borderTop: "3px solid #33373e",
+            borderLeft: "3px solid #33373e",
+            borderBottom: "3px solid #090a0c",
+            borderRight: "3px solid #090a0c",
+            boxShadow: "10px 10px 25px rgba(0,0,0,0.9), inset 2px 2px 5px rgba(255,255,255,0.05)",
+          }}
+        >
+          <Screw className="top-3 left-3" />
+          <Screw className="top-3 right-3" />
+          <Screw className="bottom-3 left-3" />
+          <Screw className="right-3 bottom-3" />
+
+          <div className="mb-12">
+            <BankLabel>National Partners</BankLabel>
+            <div className="flex flex-wrap justify-center gap-5 sm:gap-6">
+              {nationalPartners.map((partner, i) => (
+                <PartnerKey key={partner.src} partner={partner} tone="dark" index={i} />
+              ))}
+            </div>
+          </div>
+
+          {/* Panel seam between the two banks */}
+          <div className="mb-12 h-[2px] w-full bg-gradient-to-r from-transparent via-[#090a0c] to-transparent shadow-[0_1px_0_rgba(255,255,255,0.04)]" />
+
+          <div>
+            <BankLabel>International Partners</BankLabel>
+            <div className="flex flex-wrap justify-center gap-5 sm:gap-6">
+              {internationalPartners.map((partner, i) => (
+                <PartnerKey key={partner.src} partner={partner} tone="light" index={i} />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 export function Venues() {
   return (
     <section id="venues" className="relative py-24">
