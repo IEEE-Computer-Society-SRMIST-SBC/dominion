@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense, lazy, useEffect, useState } from "react";
 import Navbar from "@/components/dominion/Navbar";
+import DiscordFloatingWidget from "@/components/dominion/DiscordFloatingWidget";
+import WhatsAppFloatingWidget from "@/components/dominion/WhatsAppFloatingWidget";
 import Hero from "@/components/dominion/Hero";
 import {
   Highlights,
@@ -85,6 +87,8 @@ function Index() {
         <Contact />
       </main>
       <Footer />
+      <DiscordFloatingWidget />
+      <WhatsAppFloatingWidget />
     </div>
   );
 }
