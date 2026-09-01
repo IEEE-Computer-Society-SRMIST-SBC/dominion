@@ -1,127 +1,244 @@
-import React, { useRef, useMemo, useState, useEffect } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useScroll, motion, useTransform, useSpring } from "framer-motion";
+import React, { useRef, useMemo, useState, useEffect, useCallback } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import * as THREE from "three";
+import { Clock, Sparkles, ChevronRight, AlertCircle } from "lucide-react";
 
 useGLTF.preload("/spaceship.glb");
 
-// ─── Procedural Stylized Rocket ────────────────────────────────────────────
-function Rocket({ scrollY }: { scrollY: any }) {
+// ─── 3D Spaceship Centered On Node ─────────────────────────────────────────
+function MiniRocket({
+  scrollProgress,
+  activeIndex,
+  rocketScale,
+}: {
+  scrollProgress: any;
+  activeIndex: number;
+  rocketScale: number;
+}) {
   const group = useRef<THREE.Group>(null!);
   const { scene } = useGLTF("/spaceship.glb");
 
-  useFrame((state, delta) => {
-    if (!group.current) return;
-    const progress = scrollY.get(); // 0 to 1
-    
-    // Base floating animation
-    const floatY = Math.sin(state.clock.elapsedTime * 2) * 0.1;
-    
-    // If progress approaches 1 (breakthrough), blast off
-    const blastOff = progress > 0.95 ? (progress - 0.95) * 500 : 0;
-    
-    // Speed up as it goes up
-    const accProgress = Math.pow(progress, 2);
-    
-    group.current.position.y = -2 + (accProgress * 4) + floatY + blastOff;
-    group.current.rotation.x = Math.PI / 2; // Face up (pitch up 90 degrees)
-    group.current.rotation.y = 0; // Rotated by 180 degrees as requested
-    group.current.rotation.z = 0; // Keep it perfectly vertical
-  });
+  // Premium Material Enhancement: Sleek sci-fi metallic sheen and vibrant neon emissive
+  useMemo(() => {
+    scene.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.material) {
+          const mat = mesh.material as THREE.MeshStandardMaterial;
+          if (mat.metalness !== undefined) {
+            mat.metalness = Math.max(mat.metalness, 0.85);
+            mat.roughness = Math.min(mat.roughness, 0.26);
+          }
+          if (mat.emissive) {
+            mat.emissiveIntensity = 2.2;
+          }
+        }
+      }
+    });
+  }, [scene]);
 
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  const rocketScale = isMobile ? 0.15 : 0.3;
+  useFrame((state) => {
+    if (!group.current) return;
+    const t = state.clock.elapsedTime;
+    const p = Math.max(0, Math.min(1, scrollProgress.get() || 0));
+
+    // Subtle flight banking on desktop
+    const targetBank = rocketScale < 0.28 ? 0 : activeIndex % 2 === 0 ? 0.05 : -0.05;
+
+    // Zero-g hover micro-motion
+    const hoverY = Math.sin(t * (3 + p * 2)) * 0.035;
+    const rollY = Math.sin(t * 1.6) * 0.02;
+
+    group.current.position.y = hoverY;
+    group.current.rotation.z = targetBank;
+    group.current.rotation.y = rollY;
+  });
 
   return (
     <group ref={group} scale={rocketScale}>
-      <primitive object={scene} />
+      {/* ─── Glowing Plasma Thruster Plume Flame ─── */}
+      <group position={[0, 0.72, 0]}>
+        {/* Outer Cyan Plasma Cone */}
+        <mesh position={[0, 0.16, 0]}>
+          <coneGeometry args={[0.14, 0.35, 20, 1, true]} />
+          <meshBasicMaterial
+            color="#00ffcc"
+            transparent
+            opacity={0.65}
+            side={THREE.DoubleSide}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+        {/* Inner White Core Flame */}
+        <mesh position={[0, 0.1, 0]}>
+          <coneGeometry args={[0.075, 0.22, 16, 1, true]} />
+          <meshBasicMaterial
+            color="#ffffff"
+            transparent
+            opacity={0.9}
+            side={THREE.DoubleSide}
+            blending={THREE.AdditiveBlending}
+            depthWrite={false}
+          />
+        </mesh>
+      </group>
+
+      {/* High-Tech Glowing Ion Core at Thruster Nozzle */}
+      <mesh position={[0, 0.68, 0.05]}>
+        <sphereGeometry args={[0.065, 16, 16]} />
+        <meshBasicMaterial color="#a8fff2" />
+      </mesh>
+
+      {/* Layered Neon Green Thruster Halo Rings matching reference image */}
+      <mesh position={[0, 0.7, 0]}>
+        <ringGeometry args={[0.18, 0.25, 32]} />
+        <meshBasicMaterial color="#01E864" transparent opacity={0.8} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh position={[0, 0.7, 0]}>
+        <ringGeometry args={[0.25, 0.31, 32]} />
+        <meshBasicMaterial color="#00ffcc" transparent opacity={0.35} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Wingtip Navigation Lights */}
+      <mesh position={[-0.46, 0.22, 0.04]}>
+        <sphereGeometry args={[0.024, 12, 12]} />
+        <meshBasicMaterial color="#00ffea" />
+      </mesh>
+      <pointLight position={[-0.46, 0.22, 0.05]} intensity={0.9} color="#00ffea" distance={1.2} />
+
+      <mesh position={[0.46, 0.22, 0.04]}>
+        <sphereGeometry args={[0.024, 12, 12]} />
+        <meshBasicMaterial color="#01E864" />
+      </mesh>
+      <pointLight position={[0.46, 0.22, 0.05]} intensity={0.9} color="#01E864" distance={1.2} />
+
+      {/* Nose Ion Beam Light cutting through the conduit */}
+      <mesh position={[0, -0.74, 0.02]}>
+        <sphereGeometry args={[0.022, 12, 12]} />
+        <meshBasicMaterial color="#00ffaa" />
+      </mesh>
+      <pointLight position={[0, -0.74, 0.08]} intensity={1.5} color="#00ffaa" distance={1.8} />
+
+      {/* 2D Plane 180° Flip: Nose points DOWN, engines at TOP */}
+      <group rotation={[0, 0, Math.PI]}>
+        {/* Original GLTF pitch: Cockpit and cyan neon trim face camera */}
+        <group rotation={[Math.PI / 2, 0, 0]}>
+          <primitive object={scene} />
+        </group>
+      </group>
     </group>
   );
 }
 
-// ─── Exhaust Particles ─────────────────────────────────────────────────────
-function Exhaust({ scrollY }: { scrollY: any }) {
-  const fumeCount = 150;
-  const sparkCount = 150;
-  
+// ─── Refined Gradual Exhaust Smoke & Spark Particles (Billowing Upwards) ───
+function MiniExhaust({
+  scrollProgress,
+  isMobile,
+  rocketScale,
+}: {
+  scrollProgress: any;
+  isMobile: boolean;
+  rocketScale: number;
+}) {
+  const fumeCount = 45; // Reduced from 80 for cleaner, lighter smoke
+  const sparkCount = 65;
+
   const fumesRef = useRef<THREE.InstancedMesh>(null!);
   const sparksRef = useRef<THREE.InstancedMesh>(null!);
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  
+
+  const scaleFactor = rocketScale / 0.25;
+
   const fumes = useMemo(() => {
     return Array.from({ length: fumeCount }, () => ({
-      position: new THREE.Vector3(0, -100, 0), // hide initially
+      position: new THREE.Vector3(0, -100, 0),
       velocity: new THREE.Vector3(),
       life: 0,
-      maxLife: Math.random() * 0.8 + 0.4,
-      scale: Math.random() * 0.5 + 0.3,
+      maxLife: Math.random() * 0.7 + 0.35,
+      scale: (Math.random() * 0.26 + 0.15) * scaleFactor,
     }));
-  }, []);
+  }, [fumeCount, scaleFactor]);
 
   const sparks = useMemo(() => {
     return Array.from({ length: sparkCount }, () => ({
       position: new THREE.Vector3(0, -100, 0),
       velocity: new THREE.Vector3(),
       life: 0,
-      maxLife: Math.random() * 0.4 + 0.2,
-      scale: Math.random() * 0.1 + 0.05,
+      maxLife: Math.random() * 0.35 + 0.15,
+      scale: (Math.random() * 0.09 + 0.04) * scaleFactor,
     }));
-  }, []);
+  }, [sparkCount, scaleFactor]);
 
   let nextFume = 0;
   let nextSpark = 0;
 
   useFrame((state, delta) => {
     if (!fumesRef.current || !sparksRef.current) return;
-    
-    const progress = scrollY.get();
-    const isMoving = progress < 0.99; // Spawn as long as we haven't reached the very end
-    
-    // Spawn more particles as it speeds up, but keep a base idle amount
-    const intensity = Math.max(0.8, progress * 4);
-    
-    // Spawn new particles if moving
-    if (isMoving) {
-      const blastOff = progress > 0.95 ? (progress - 0.95) * 500 : 0;
-      const accProgress = Math.pow(progress, 2);
-      const rY = -2 + (accProgress * 4) + Math.sin(state.clock.elapsedTime * 2) * 0.1 + blastOff;
-      
-      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-      const offset = isMobile ? 0.6 : 1.2;
-      const spread = isMobile ? 0.75 : 1.5;
 
-      // Spawn Fumes
-      for (let i = 0; i < Math.floor(2 * intensity); i++) {
-        const p = fumes[nextFume];
-        p.position.set((Math.random() - 0.5) * spread, rY - offset, (Math.random() - 0.5) * spread);
-        p.velocity.set((Math.random() - 0.5) * 1.0, -1.5 - Math.random() * 2.0, (Math.random() - 0.5) * 1.0);
-        p.life = p.maxLife;
-        nextFume = (nextFume + 1) % fumeCount;
-      }
+    const p = Math.max(0, Math.min(1, scrollProgress.get() || 0));
+    // Refined gradual intensity
+    const intensity = 0.2 + p * 0.75;
 
-      // Spawn Sparks
-      for (let i = 0; i < Math.floor(3 * intensity); i++) {
-        const p = sparks[nextSpark];
-        p.position.set((Math.random() - 0.5) * spread, rY - offset, (Math.random() - 0.5) * spread);
-        p.velocity.set((Math.random() - 0.5) * 3, -4 - Math.random() * 5, (Math.random() - 0.5) * 3);
-        p.life = p.maxLife;
-        nextSpark = (nextSpark + 1) % sparkCount;
-      }
+    // Thruster nozzle position at top (+Y) dynamically scaled
+    const rY = 0.72 * scaleFactor + Math.sin(state.clock.elapsedTime * 3) * 0.035;
+    // Tighter, cleaner column spread
+    const spread = (isMobile ? 0.24 : 0.36) * scaleFactor * (0.65 + p * 0.45);
+
+    // Controlled spawn rate: 1 fume per frame at idle, 2 during transit
+    const spawnCount = Math.floor(0.8 + intensity * 1.4);
+
+    // Spawn fumes billowing UPWARDS (+Y)
+    for (let i = 0; i < spawnCount; i++) {
+      const f = fumes[nextFume];
+      f.position.set(
+        (Math.random() - 0.5) * spread,
+        rY,
+        (Math.random() - 0.5) * spread
+      );
+      f.velocity.set(
+        (Math.random() - 0.5) * (0.35 + p * 0.4) * scaleFactor,
+        (1.5 + Math.random() * 1.6) * (0.8 + p * 0.4) * scaleFactor,
+        (Math.random() - 0.5) * (0.35 + p * 0.4) * scaleFactor
+      );
+      f.scale = (Math.random() * 0.22 + 0.14) * scaleFactor * (0.75 + p * 0.65);
+      f.life = f.maxLife * (0.75 + p * 0.35);
+      nextFume = (nextFume + 1) % fumeCount;
+    }
+
+    // Spawn sparks shooting UPWARDS (+Y)
+    const sparkSpawnCount = Math.floor(intensity * 1.8);
+    for (let i = 0; i < sparkSpawnCount; i++) {
+      const s = sparks[nextSpark];
+      s.position.set(
+        (Math.random() - 0.5) * (spread * 0.6),
+        rY,
+        (Math.random() - 0.5) * (spread * 0.6)
+      );
+      s.velocity.set(
+        (Math.random() - 0.5) * (0.9 + p * 1.0) * scaleFactor,
+        (2.4 + Math.random() * 2.8) * (0.8 + p * 0.4) * scaleFactor,
+        (Math.random() - 0.5) * (0.9 + p * 1.0) * scaleFactor
+      );
+      s.scale = (Math.random() * 0.08 + 0.04) * scaleFactor * (0.75 + p * 0.6);
+      s.life = s.maxLife;
+      nextSpark = (nextSpark + 1) % sparkCount;
     }
 
     // Update fumes
-    fumes.forEach((p, i) => {
-      if (p.life > 0) {
-        p.life -= delta;
-        p.position.addScaledVector(p.velocity, delta);
-        const lifeProgress = p.life / p.maxLife;
-        dummy.position.copy(p.position);
-        dummy.scale.setScalar(p.scale * (1.5 - lifeProgress)); // Fumes grow
+    fumes.forEach((f, i) => {
+      if (f.life > 0) {
+        f.life -= delta;
+        f.position.addScaledVector(f.velocity, delta);
+        const lifeProgress = f.life / f.maxLife;
+        dummy.position.copy(f.position);
+        dummy.scale.setScalar(f.scale * (1.5 - lifeProgress * 0.5));
         dummy.updateMatrix();
         fumesRef.current.setMatrixAt(i, dummy.matrix);
       } else {
-        dummy.position.set(0, -100, 0); // hide
+        dummy.position.set(0, -100, 0);
         dummy.updateMatrix();
         fumesRef.current.setMatrixAt(i, dummy.matrix);
       }
@@ -129,17 +246,17 @@ function Exhaust({ scrollY }: { scrollY: any }) {
     fumesRef.current.instanceMatrix.needsUpdate = true;
 
     // Update sparks
-    sparks.forEach((p, i) => {
-      if (p.life > 0) {
-        p.life -= delta;
-        p.position.addScaledVector(p.velocity, delta);
-        const lifeProgress = p.life / p.maxLife;
-        dummy.position.copy(p.position);
-        dummy.scale.setScalar(p.scale * lifeProgress); // Sparks shrink
+    sparks.forEach((s, i) => {
+      if (s.life > 0) {
+        s.life -= delta;
+        s.position.addScaledVector(s.velocity, delta);
+        const lifeProgress = s.life / s.maxLife;
+        dummy.position.copy(s.position);
+        dummy.scale.setScalar(s.scale * lifeProgress);
         dummy.updateMatrix();
         sparksRef.current.setMatrixAt(i, dummy.matrix);
       } else {
-        dummy.position.set(0, -100, 0); // hide
+        dummy.position.set(0, -100, 0);
         dummy.updateMatrix();
         sparksRef.current.setMatrixAt(i, dummy.matrix);
       }
@@ -150,361 +267,652 @@ function Exhaust({ scrollY }: { scrollY: any }) {
   return (
     <>
       <instancedMesh ref={fumesRef} args={[undefined, undefined, fumeCount]}>
-        <sphereGeometry args={[0.5, 8, 8]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.5} depthWrite={false} />
+        <sphereGeometry args={[0.28, 8, 8]} />
+        {/* Softer translucent ethereal smoke */}
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.28} depthWrite={false} />
       </instancedMesh>
       <instancedMesh ref={sparksRef} args={[undefined, undefined, sparkCount]}>
-        <sphereGeometry args={[0.2, 8, 8]} />
-        <meshBasicMaterial color="#ffff00" transparent opacity={1} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <sphereGeometry args={[0.12, 8, 8]} />
+        <meshBasicMaterial color="#ffff00" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} />
       </instancedMesh>
     </>
   );
 }
 
-// ─── Scene Setup ───────────────────────────────────────────────────────────
-function Scene({ scrollY, activeMilestone }: { scrollY: any; activeMilestone: number }) {
-  const { camera } = useThree();
-  const shakeRef = useRef(0);
-  const prevMilestone = useRef(activeMilestone);
+// ─── Dynamic Thruster Light with Plasma Micro-Flicker ──────────────────────
+function DynamicEngineLight({
+  scrollProgress,
+  rocketScale,
+}: {
+  scrollProgress: any;
+  rocketScale: number;
+}) {
+  const lightRef = useRef<THREE.PointLight>(null!);
 
-  useEffect(() => {
-    if (activeMilestone !== prevMilestone.current && activeMilestone > -1) {
-      shakeRef.current = 0.5; // Trigger shake on new milestone
-      prevMilestone.current = activeMilestone;
-    }
-  }, [activeMilestone]);
-
-  useFrame((state, delta) => {
-    // Shift camera on mobile so rocket appears on the right
-    const isMobile = window.innerWidth < 768;
-    const targetX = isMobile ? -1.0 : 0;
-
-    if (shakeRef.current > 0) {
-      const shake = shakeRef.current;
-      camera.position.x = targetX + (Math.random() - 0.5) * shake;
-      camera.position.y = (Math.random() - 0.5) * shake;
-      shakeRef.current -= delta * 2;
-    } else {
-      camera.position.x += (targetX - camera.position.x) * delta * 5;
-      camera.position.y = 0;
-    }
+  useFrame((state) => {
+    if (!lightRef.current) return;
+    const p = Math.max(0, Math.min(1, scrollProgress.get() || 0));
+    const flicker = Math.sin(state.clock.elapsedTime * 18) * 0.25;
+    lightRef.current.intensity = 3.2 + p * 4.5 + flicker;
   });
 
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5, 5, 5]} intensity={1} color="#ffffff" />
-      <pointLight position={[0, -2, 0]} intensity={5} color="#01E864" distance={10} />
-      
-      <Rocket scrollY={scrollY} />
-      <Exhaust scrollY={scrollY} />
-    </>
-  );
+  const nozzleY = 0.72 * (rocketScale / 0.25);
+  return <pointLight ref={lightRef} position={[0, nozzleY, 0]} color="#01E864" distance={7} />;
 }
 
-// ─── Milestones Data ───────────────────────────────────────────────────────
-const milestones = [
-  { num: "01", title: "IGNITION", desc: "Participant reporting & registration", date: "09:30 AM – 10:00 AM", day: 1 },
-  { num: "02", title: "ARRIVAL", desc: "Arrival & reception of HackerRank officials and guests", date: "09:30 AM – 10:00 AM", day: 1 },
-  { num: "03", title: "OPENING", desc: "Opening address", date: "10:00 AM – 10:05 AM", day: 1 },
-  { num: "04", title: "WELCOME", desc: "Welcome address", date: "10:05 AM – 10:10 AM", day: 1 },
-  { num: "05", title: "INTRODUCTION", desc: "Introduction of guests & HackerRank officials", date: "10:10 AM – 10:20 AM", day: 1 },
-  { num: "06", title: "FELICITATION", desc: "Felicitation of guests", date: "10:20 AM – 10:30 AM", day: 1 },
-  { num: "07", title: "LAUNCH", desc: "Launch of the secretariat for the upcoming tenure of HackerRank Campus Crew", date: "10:30 AM – 10:40 AM", day: 1 },
-  { num: "08", title: "CELEBRATION", desc: "One-year anniversary cake-cutting ceremony", date: "10:40 AM – 10:50 AM", day: 1 },
-  { num: "09", title: "SPONSOR SPOTLIGHT", desc: "Sponsor promotion video — RISE Research", date: "10:50 AM – 11:00 AM", day: 1 },
-  { num: "10", title: "ICEBREAKER", desc: "Main sponsor promotion video + icebreaker", date: "11:00 AM – 11:10 AM", day: 1 },
-  { num: "11", title: "MISSION BRIEFING", desc: "Official introduction to the DOMINION Buildathon, Rules & problem statement briefing", date: "11:10 AM – 11:20 AM", day: 1 },
-  { num: "12", title: "LIFTOFF", desc: "DOMINION Buildathon — development phase 1 begins", date: "11:20 AM – 02:00 PM", day: 1 },
-  { num: "13", title: "TRAJECTORY CHECK", desc: "Review round 1 — initial evaluation & mentoring", date: "02:00 PM – 03:00 PM", day: 1 },
-  { num: "14", title: "REFUEL", desc: "Refreshment & food break", date: "03:00 PM – 03:30 PM", day: 1 },
-  { num: "15", title: "ASCENT", desc: "Buildathon development continues based on review feedback", date: "03:30 PM – 05:15 PM", day: 1 },
-  { num: "16", title: "WRAP-UP", desc: "Day 1 wrap-up, important instructions & briefing", date: "05:15 PM – 05:30 PM", day: 1 },
-  { num: "17", title: "ORBIT", desc: "Day 1 culmination", date: "05:30 PM", day: 1 },
-  { num: "18", title: "SHORTLIST", desc: "Announcement of shortlisted teams for Round 2", date: "After 05:30 PM", day: 1 },
-  { num: "19", title: "RE-ENTRY", desc: "Shortlisted teams reporting & check-in", date: "09:30 AM – 10:00 AM", day: 2 },
-  { num: "20", title: "BRIEFING", desc: "Day 2 opening & briefing", date: "10:00 AM – 10:10 AM", day: 2 },
-  { num: "21", title: "FINAL ASCENT", desc: "Round 2 final Buildathon phase begins", date: "10:20 AM – 12:00 PM", day: 2 },
-  { num: "22", title: "PREPARATION", desc: "Break & final preparation time", date: "12:00 PM – 12:30 PM", day: 2 },
-  { num: "23", title: "SUBMISSION", desc: "Final round project completion & submission", date: "12:30 PM – 01:30 PM", day: 2 },
-  { num: "24", title: "JUDGING", desc: "Final judging & project presentations", date: "01:30 PM – 02:45 PM", day: 2 },
-  { num: "25", title: "DELIBERATION", desc: "Judges' deliberation & final evaluation", date: "02:45 PM – 03:15 PM", day: 2 },
-  { num: "26", title: "LANDING", desc: "Announcement of final results", date: "03:15 PM – 03:30 PM", day: 2 },
-  { num: "27", title: "DOMINION", desc: "DOMINION 2026 — official culmination", date: "03:30 PM", day: 2 }
+// ─── Timeline Data ─────────────────────────────────────────────────────────
+interface TimelineEvent {
+  id: string;
+  time: string;
+  title: string;
+  isImportant?: boolean;
+}
+
+const day1Events: TimelineEvent[] = [
+  {
+    id: "d1-01",
+    time: "09:30 AM – 10:00 AM",
+    title: "Participant Reporting & Registration",
+    isImportant: true,
+  },
+  {
+    id: "d1-02",
+    time: "09:30 AM – 10:00 AM",
+    title: "Arrival & Reception of HackerRank Officials and Guests",
+  },
+  {
+    id: "d1-03",
+    time: "10:00 AM – 10:05 AM",
+    title: "Opening Address",
+  },
+  {
+    id: "d1-04",
+    time: "10:05 AM – 10:10 AM",
+    title: "Welcome Address",
+  },
+  {
+    id: "d1-05",
+    time: "10:10 AM – 10:20 AM",
+    title: "Introduction of Guests & HackerRank Officials",
+  },
+  {
+    id: "d1-06",
+    time: "10:20 AM – 11:00 AM",
+    title: "Felicitation of Guests + Address",
+  },
+  {
+    id: "d1-07",
+    time: "11:00 AM – 11:20 AM",
+    title: "Launch of Secretariat",
+  },
+  {
+    id: "d1-08",
+    time: "11:20 AM – 11:40 AM",
+    title: "Sponsorship Promotion",
+  },
+  {
+    id: "d1-09",
+    time: "11:40 AM – 12:00 PM",
+    title: "Buildathon Starts",
+    isImportant: true,
+  },
+  {
+    id: "d1-10",
+    time: "12:00 PM – 01:00 PM",
+    title: "Lunch",
+    isImportant: true,
+  },
+  {
+    id: "d1-11",
+    time: "01:00 PM – 03:30 PM",
+    title: "Comeback + Judging",
+    isImportant: true,
+  },
+  {
+    id: "d1-12",
+    time: "03:30 PM – 05:15 PM",
+    title: "Buildathon Development Continues Based on Review Feedback",
+    isImportant: true,
+  },
+  {
+    id: "d1-13",
+    time: "After 05:15 PM",
+    title: "Announcement of Shortlisted Teams for Round 2",
+    isImportant: true,
+  },
 ];
 
-const COLLAPSED_ITEM_HEIGHT = 56;
+const day2Events: TimelineEvent[] = [
+  {
+    id: "d2-01",
+    time: "09:30 AM – 10:00 AM",
+    title: "Participant Reporting & Team Check-In",
+    isImportant: true,
+  },
+  {
+    id: "d2-02",
+    time: "10:00 AM – 10:20 AM",
+    title: "Day 2 Opening & Briefing",
+  },
+  {
+    id: "d2-03",
+    time: "10:20 AM – 12:00 PM",
+    title: "Round 2 Final Buildathon Phase Begins",
+    isImportant: true,
+  },
+  {
+    id: "d2-04",
+    time: "12:00 PM – 12:30 PM",
+    title: "Break & Final Preparation Time",
+    isImportant: true,
+  },
+  {
+    id: "d2-05",
+    time: "12:30 PM – 01:30 PM",
+    title: "Final Round Project Completion & Submission",
+    isImportant: true,
+  },
+  {
+    id: "d2-06",
+    time: "01:30 PM – 02:45 PM",
+    title: "Final Judging & Project Presentations",
+    isImportant: true,
+  },
+  {
+    id: "d2-07",
+    time: "02:45 PM – 03:15 PM",
+    title: "Judges' Deliberation & Final Evaluation",
+  },
+  {
+    id: "d2-08",
+    time: "03:15 PM – 03:30 PM",
+    title: "Announcement of Final Results",
+    isImportant: true,
+  },
+  {
+    id: "d2-09",
+    time: "03:30 PM Onwards",
+    title: "DOMAINION 2026 Official Culmination",
+    isImportant: true,
+  },
+];
 
-// ─── HTML Overlay Component ────────────────────────────────────────────────
 export default function RocketTimeline() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
+  const [activeDay, setActiveDay] = useState<1 | 2>(1);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  const currentEvents = activeDay === 1 ? day1Events : day2Events;
+
+  const [activeMilestone, setActiveMilestone] = useState(0);
+  const [trackBounds, setTrackBounds] = useState({ firstY: 36, totalHeight: 400 });
+
+  // Spring physics for rocket vertical pixel position
+  const rocketYMotion = useMotionValue(36);
+  const rocketYSpring = useSpring(rocketYMotion, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.5,
   });
 
-  const [active, setActive] = useState(-1);
+  // Spring physics for progress float (0 to 1) for exhaust smoke
+  const progressMotion = useMotionValue(0);
+  const smoothProgress = useSpring(progressMotion, {
+    stiffness: 100,
+    damping: 22,
+    restDelta: 0.001,
+  });
 
-  // Update active milestone based on scroll
-  useEffect(() => {
-    return scrollYProgress.onChange((v) => {
-      const startRange = 0.08;
-      const endRange = 0.90;
-      if (v < startRange) {
-        setActive(-1);
-      } else if (v > endRange) {
-        setActive(milestones.length - 1);
-      } else {
-        const fraction = (v - startRange) / (endRange - startRange);
-        const index = Math.floor(fraction * milestones.length);
-        setActive(Math.max(0, Math.min(milestones.length - 1, index)));
+  // Query actual DOM circle elements to lock the center of the rocket exactly on each node
+  const updateRocketPosition = useCallback(() => {
+    if (!trackRef.current) return;
+    const circles = trackRef.current.querySelectorAll<HTMLElement>("[data-timeline-circle]");
+    if (circles.length === 0) return;
+
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const vh = window.innerHeight || 800;
+    const focusY = vh * 0.5;
+
+    // Track bounds for laser rail
+    const firstCircleRect = circles[0].getBoundingClientRect();
+    const lastCircleRect = circles[circles.length - 1].getBoundingClientRect();
+    const firstY = Math.max(0, firstCircleRect.top - trackRect.top + firstCircleRect.height / 2);
+    const lastY = Math.max(firstY, lastCircleRect.top - trackRect.top + lastCircleRect.height / 2);
+    setTrackBounds({ firstY, totalHeight: Math.max(0, lastY - firstY) });
+
+    // Find closest circle to screen center
+    let closestIdx = 0;
+    let minDistance = Infinity;
+
+    circles.forEach((circle, idx) => {
+      const rect = circle.getBoundingClientRect();
+      const circleCenterY = rect.top + rect.height / 2;
+      const dist = Math.abs(circleCenterY - focusY);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestIdx = idx;
       }
     });
-  }, [scrollYProgress]);
 
-  // Breakthrough flash animation
-  const flashOpacity = useTransform(scrollYProgress, [0.93, 0.96, 1], [0, 1, 0]);
-  const endScreenOpacity = useTransform(scrollYProgress, [0.95, 1], [0, 1]);
+    setActiveMilestone(closestIdx);
 
-  // Apply spring physics to scroll progress for beautiful inertial sliding
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 20,
-    restDelta: 0.001
-  });
-
-  // Calculate dynamic list translation using responsive window height parameters
-  const listY = useTransform(smoothProgress, (v) => {
-    const startRange = 0.08;
-    const endRange = 0.90;
-    const innerHeight = typeof window !== "undefined" ? window.innerHeight : 800;
-    const centerOffset = innerHeight * 0.45; // Centered position in the viewport
-    const initialOffset = 180; // Compact position near the headers before scrolling
-    
-    if (v < 0) return initialOffset;
-    
-    if (v < startRange) {
-      const progress = v / startRange;
-      return initialOffset + progress * (centerOffset - initialOffset);
+    // Exact pixel center of the circle relative to trackRef
+    const activeCircle = circles[closestIdx];
+    if (activeCircle) {
+      const activeRect = activeCircle.getBoundingClientRect();
+      const exactCenterY = activeRect.top - trackRect.top + activeRect.height / 2;
+      if (!isNaN(exactCenterY) && exactCenterY > 0) {
+        rocketYMotion.set(exactCenterY);
+      }
     }
-    
-    if (v > endRange) return -((milestones.length - 1) * COLLAPSED_ITEM_HEIGHT) + centerOffset;
-    
-    const fraction = (v - startRange) / (endRange - startRange);
-    const activeIndex = fraction * (milestones.length - 1);
-    return -(activeIndex * COLLAPSED_ITEM_HEIGHT) + centerOffset;
+
+    const p = circles.length > 1 ? closestIdx / (circles.length - 1) : 0;
+    progressMotion.set(p);
+  }, [rocketYMotion, progressMotion]);
+
+  // Handle scroll, resize, and day toggle
+  useEffect(() => {
+    updateRocketPosition();
+    const t1 = setTimeout(updateRocketPosition, 40);
+    const t2 = setTimeout(updateRocketPosition, 150);
+    const t3 = setTimeout(updateRocketPosition, 350);
+
+    window.addEventListener("scroll", updateRocketPosition, { passive: true });
+    window.addEventListener("resize", updateRocketPosition, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", updateRocketPosition);
+      window.removeEventListener("resize", updateRocketPosition);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [activeDay, updateRocketPosition]);
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  const rocketScale = isMobile ? 0.24 : 0.36;
+
+  // Active laser conduit illuminates up to the rocket center
+  const activeLineHeight = useTransform(rocketYSpring, (y) => {
+    const val = typeof y === "number" ? y : trackBounds.firstY;
+    const h = Math.max(0, val - trackBounds.firstY);
+    return `${h}px`;
   });
-
-  const currentDayInfo = useMemo(() => {
-    if (active === -1 || active < 18) {
-      return {
-        day: "DAY 01 — 2nd SEPTEMBER 2026",
-        phase: "INAUGURATION & BUILDATHON — PHASE 1"
-      };
-    } else {
-      return {
-        day: "DAY 02 — 3rd SEPTEMBER 2026",
-        phase: "FINAL BUILDATHON, JUDGING & RESULTS"
-      };
-    }
-  }, [active]);
-
-  // Helper variables for managing the sliding rail boundaries
-  const railActiveOffset = useMemo(() => {
-    return Math.max(0, active - 2);
-  }, [active]);
 
   return (
-    <section id="timeline" ref={containerRef} className="relative bg-[#030807]" style={{ height: "1000vh" }}>
-      {/* Sticky Container */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        
-        {/* 3D Canvas */}
-        <div className="absolute inset-0 z-0">
-          <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-            <React.Suspense fallback={null}>
-              <Scene scrollY={scrollYProgress} activeMilestone={active} />
-            </React.Suspense>
-          </Canvas>
+    <section
+      id="timeline"
+      className="relative overflow-hidden bg-[#030807] py-20 sm:py-28 border-y border-[#121f18]"
+    >
+      {/* Sci-Fi Background Glow & Grid */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,_rgba(1,232,100,0.05)_0%,_transparent_75%)]" />
+      <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(1,232,100,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(1,232,100,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+      {/* Subtle Metallic Border Accents */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-[#01E864]/40 to-transparent" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-[1px] bg-gradient-to-r from-transparent via-[#01E864]/25 to-transparent" />
+
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        {/* Section Heading */}
+        <div className="text-center mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#01E864]/30 bg-[#01E864]/5 text-[#01E864] font-mono text-[0.65rem] sm:text-xs tracking-[0.25em] uppercase mb-4"
+          >
+            <Sparkles className="w-3 h-3 text-[#01E864]" />
+            MISSION PROTOCOL
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="font-display text-3xl sm:text-4xl md:text-5xl font-black text-[#E8FFF2] tracking-wider uppercase"
+            style={{ textShadow: "0 0 25px rgba(1,232,100,0.25)" }}
+          >
+            EVENT TIMELINE
+          </motion.h2>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="mt-3 text-sm sm:text-base text-[#8c9e94] max-w-xl mx-auto font-sans"
+          >
+            Chronological schedule for DOMINION 2026 across two days of intense innovation.
+          </motion.p>
         </div>
 
-        {/* UI Overlay */}
-        <div className="absolute inset-0 z-10 pointer-events-none flex">
-          
-          {/* Top Center: Section Heading */}
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
-            <h1 
-              className="font-display text-2xl sm:text-3xl font-black text-[#E8FFF2] tracking-[0.3em] uppercase text-center" 
-              style={{ textShadow: "0 0 15px rgba(232,255,242,0.4)" }}
-            >
-              EVENT TIMELINE
-            </h1>
-            <div className="h-[2px] w-16 bg-[#01E864] mt-2 shadow-[0_0_8px_#01E864]" />
+        {/* Tactical Day Selector */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10">
+          <button
+            type="button"
+            onClick={() => setActiveDay(1)}
+            className={`relative w-full sm:w-auto px-6 py-3.5 rounded-lg border transition-all duration-300 text-left sm:text-center flex items-center justify-between sm:justify-center gap-4 cursor-pointer ${
+              activeDay === 1
+                ? "bg-[#0a1811] border-[#01E864] shadow-[0_0_20px_rgba(1,232,100,0.25)] text-[#E8FFF2]"
+                : "bg-[#060c09] border-[#15241b] text-[#76877d] hover:border-[#01E864]/40 hover:text-[#d3e5db]"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={`flex h-2.5 w-2.5 rounded-full ${
+                  activeDay === 1
+                    ? "bg-[#01E864] shadow-[0_0_8px_#01E864]"
+                    : "bg-[#25392d]"
+                }`}
+              />
+              <div>
+                <p className="font-display text-xs sm:text-sm font-bold tracking-wider">
+                  DAY 01 // 2ND SEPT 2026
+                </p>
+                <p className="font-mono text-[0.65rem] sm:text-xs text-[#01E864]/80 tracking-wider">
+                  INAUGURATION & BUILDATHON PHASE 1
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 sm:hidden text-[#01E864]/60" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveDay(2)}
+            className={`relative w-full sm:w-auto px-6 py-3.5 rounded-lg border transition-all duration-300 text-left sm:text-center flex items-center justify-between sm:justify-center gap-4 cursor-pointer ${
+              activeDay === 2
+                ? "bg-[#0a1811] border-[#01E864] shadow-[0_0_20px_rgba(1,232,100,0.25)] text-[#E8FFF2]"
+                : "bg-[#060c09] border-[#15241b] text-[#76877d] hover:border-[#01E864]/40 hover:text-[#d3e5db]"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <span
+                className={`flex h-2.5 w-2.5 rounded-full ${
+                  activeDay === 2
+                    ? "bg-[#01E864] shadow-[0_0_8px_#01E864]"
+                    : "bg-[#25392d]"
+                }`}
+              />
+              <div>
+                <p className="font-display text-xs sm:text-sm font-bold tracking-wider">
+                  DAY 02 // 3RD SEPT 2026
+                </p>
+                <p className="font-mono text-[0.65rem] sm:text-xs text-[#01E864]/80 tracking-wider">
+                  FINAL BUILDATHON, JUDGING & RESULTS
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 sm:hidden text-[#01E864]/60" />
+          </button>
+        </div>
+
+        {/* Tactical Legend Bar */}
+        <div className="flex items-center justify-center gap-6 sm:gap-8 mb-10 text-xs font-mono">
+          <div className="flex items-center gap-2 text-[#7e9086]">
+            <span className="h-2 w-2 rounded-full bg-[#01E864] shadow-[0_0_6px_#01E864]" />
+            <span>Ceremony & Protocol</span>
+          </div>
+          <div className="flex items-center gap-2 text-[#ffc107]">
+            <span className="h-2 w-2 rounded-full bg-[#ffb000] shadow-[0_0_8px_#ffb000]" />
+            <span className="font-bold">Participant Milestones</span>
+          </div>
+        </div>
+
+        {/* Day 2 Notice Banner */}
+        {activeDay === 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-10 mx-auto max-w-xl p-3.5 rounded-md bg-[#161205] border border-[#ffb000]/40 text-[#ffc107] text-xs font-mono text-center tracking-wide flex items-center justify-center gap-2"
+          >
+            <AlertCircle className="w-4 h-4 text-[#ffc107] shrink-0" />
+            <span>Only shortlisted teams from Day 1 report on Day 2.</span>
+          </motion.div>
+        )}
+
+        {/* ─── Persistent Track Container (Housing Rocket & Conduit) ─── */}
+        <div ref={trackRef} className="relative">
+          {/* Base Laser Conduit Rail: Connects Circle 0 to Circle N-1 */}
+          <div
+            className="absolute left-4 sm:left-6 md:left-1/2 -translate-x-1/2 w-[2px] bg-[#122319]"
+            style={{
+              top: `${trackBounds.firstY}px`,
+              height: `${trackBounds.totalHeight}px`,
+            }}
+          >
+            {/* Active Glowing Conduit fill tracking up to the Rocket */}
+            <motion.div
+              className="w-full bg-gradient-to-b from-[#01E864] to-[#01E864] shadow-[0_0_12px_#01E864]"
+              style={{ height: activeLineHeight }}
+            />
           </div>
 
-          {/* Left Side Panel */}
-          <div className="relative w-[90%] md:w-1/2 h-full flex flex-col justify-start overflow-hidden">
-            
-            {/* Day Sub-Headers (Left-aligned) */}
-            <div className="absolute top-24 left-6 sm:left-10 md:left-24 z-20 flex flex-col gap-1">
-              <motion.h2 
-                key={currentDayInfo.day}
-                initial={{ opacity: 0, x: -15 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                className="font-display text-lg sm:text-xl font-bold text-[#E8FFF2] tracking-wider uppercase"
-                style={{ textShadow: "0 0 10px rgba(232,255,242,0.3)" }}
-              >
-                {currentDayInfo.day}
-              </motion.h2>
-              <motion.p 
-                key={currentDayInfo.phase}
-                initial={{ opacity: 0, x: -15 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                className="font-mono text-[0.65rem] sm:text-xs tracking-[0.15em] text-[#01E864] uppercase opacity-90"
-              >
-                {currentDayInfo.phase}
-              </motion.p>
-              {currentDayInfo.day.includes("DAY 02") && (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.7 }}
-                  className="font-mono text-[0.55rem] sm:text-[0.6rem] tracking-[0.1em] text-[#ffc107] uppercase mt-0.5"
-                >
-                  * Only shortlisted teams from Day 1 report on Day 2.
-                </motion.p>
-              )}
-            </div>
-
-            {/* Sliding Milestones Container Wrapper */}
-            <motion.div 
-              className="absolute left-0 right-0 flex flex-col justify-start pl-6 sm:pl-10 md:pl-24"
-              style={{ y: listY }}
+          {/* ─── Persistent 3D Rocket Gliding Along The Line ─── */}
+          <motion.div
+            className="absolute pointer-events-none z-30 left-4 sm:left-6 md:left-1/2 -translate-x-1/2 -translate-y-1/2 w-44 h-60 sm:w-56 sm:h-72 md:w-64 md:h-80 flex items-center justify-center"
+            style={{
+              top: useTransform(rocketYSpring, (y) => `${typeof y === "number" ? y : 36}px`),
+            }}
+          >
+            {/* Ambient Radial Energy Aura behind the spacecraft */}
+            <div className="absolute inset-x-2 inset-y-4 -z-10 rounded-full bg-[radial-gradient(ellipse_at_center,_rgba(1,232,100,0.22)_0%,_rgba(0,255,200,0.08)_45%,_transparent_75%)] blur-lg pointer-events-none" />
+            <Canvas
+              camera={{ position: [0, 0, 4.6], fov: 45 }}
+              gl={{ alpha: true, antialias: true }}
             >
-              
-              {/* Illuminated Energy Conduit (Metallic Rail) */}
-              <div 
-                className="absolute left-[32px] sm:left-[48px] md:left-[104px] w-[8px] rounded-full border-x border-[#0c0d10] bg-[#111317] shadow-[inset_1px_1px_4px_rgba(0,0,0,0.9),0_0_5px_rgba(0,0,0,0.5)] overflow-hidden transition-all duration-500"
-                style={{
-                  top: `${railActiveOffset * COLLAPSED_ITEM_HEIGHT + 12}px`, // moves to align with the first visible dot
-                  height: `${(milestones.length - 1 - railActiveOffset) * COLLAPSED_ITEM_HEIGHT}px`
-                }}
-              >
-                <motion.div 
-                  className="w-full bg-[#01E864] origin-top opacity-80 transition-all duration-300"
-                  style={{ 
-                    height: `${Math.max(0, active - railActiveOffset) * COLLAPSED_ITEM_HEIGHT}px`,
-                    boxShadow: "0 0 15px #01E864, inset 0 0 5px #ffffff"
-                  }}
+              <ambientLight intensity={0.55} />
+              {/* Studio Key Specular Light */}
+              <directionalLight position={[3, 4, 4]} intensity={2.2} color="#ffffff" />
+              {/* Sci-Fi Cyan Edge Rim Light - Highlights Metallic Wing Bevels */}
+              <pointLight position={[-3, 1, 2]} intensity={3.5} color="#00ffcc" distance={8} />
+              {/* Emerald Laser Line Glow Fill */}
+              <directionalLight position={[0, -3, 2]} intensity={0.8} color="#01E864" />
+              <DynamicEngineLight scrollProgress={smoothProgress} rocketScale={rocketScale} />
+              <React.Suspense fallback={null}>
+                <MiniRocket
+                  scrollProgress={smoothProgress}
+                  activeIndex={activeMilestone}
+                  rocketScale={rocketScale}
                 />
-              </div>
+                <MiniExhaust
+                  scrollProgress={smoothProgress}
+                  isMobile={isMobile}
+                  rocketScale={rocketScale}
+                />
+              </React.Suspense>
+            </Canvas>
+          </motion.div>
 
-              {milestones.map((m, i) => {
-                const isActive = active === i;
-                const isPassed = active > i;
+          {/* ─── Day 1 / Day 2 Event Cards (Animated with AnimatePresence) ─── */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeDay}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="relative"
+            >
+              <div className="space-y-6 sm:space-y-8">
+                {currentEvents.map((event, index) => {
+                  const isEven = index % 2 === 0;
+                  const isImportant = !!event.isImportant;
+                  const isCurrent = activeMilestone === index;
+                  const isPassed = activeMilestone > index;
 
-                // Opacity fades out items that slide up past the active zone to prevent header overlap
-                let itemOpacity = 0.4;
-                if (active >= 0) {
-                  if (i < active - 2) {
-                    itemOpacity = 0; // Disappear completely
-                  } else if (i === active - 2) {
-                    itemOpacity = 0.15; // Barely visible transition fade
-                  } else if (i === active - 1) {
-                    itemOpacity = 0.4; // standard inactive view
-                  } else if (isActive) {
-                    itemOpacity = 1.0; // fully visible active selection
-                  }
-                }
-
-                return (
-                  <div 
-                    key={m.num} 
-                    className="relative flex items-start gap-6 transition-all duration-500"
-                    style={{ 
-                      height: isActive ? "auto" : `${COLLAPSED_ITEM_HEIGHT}px`,
-                      paddingBottom: isActive ? "24px" : "0px",
-                      opacity: itemOpacity,
-                      pointerEvents: itemOpacity === 0 ? "none" : "auto"
-                    }}
-                  >
-                    
-                    {/* Tactile Mechanical Indicator */}
-                    <div 
-                      className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-500 mt-0.5 ${
-                        isActive || isPassed 
-                          ? "border-[#01E864] bg-[#0c1811] shadow-[0_0_15px_rgba(1,232,100,0.4),inset_0_0_8px_rgba(1,232,100,0.4)]" 
-                          : "border-[#2a2d34] bg-[#1c1e22] shadow-[inset_2px_2px_5px_rgba(0,0,0,0.8),1px_1px_2px_rgba(255,255,255,0.05)]"
-                      }`}
+                  return (
+                    <motion.div
+                      key={event.id}
+                      initial={{ opacity: 0, y: 15 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-30px" }}
+                      transition={{ duration: 0.35, delay: index * 0.03 }}
+                      className={`relative flex items-center ${
+                        isEven
+                          ? "md:flex-row-reverse md:justify-end"
+                          : "md:flex-row md:justify-end"
+                      } justify-start`}
                     >
-                      <div className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
-                        isActive 
-                          ? "bg-[#01E864] shadow-[0_0_10px_#01E864,inset_1px_1px_2px_#ffffff]" 
-                          : isPassed 
-                            ? "bg-[#0A3D29]"
-                            : "bg-[#111317] shadow-[inset_1px_1px_3px_rgba(0,0,0,0.8)]"
-                      }`} />
-                    </div>
-
-                    {/* Milestone Card */}
-                    <motion.div 
-                      className="relative font-display uppercase"
-                      initial={{ x: -20 }}
-                      animate={{ x: isActive ? 0 : -10 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <p 
-                        className={`text-[0.65rem] font-bold tracking-[0.35em] leading-6 ${isActive ? "text-[#01E864]" : "text-[#5b6860]"}`}
-                        style={{ textShadow: isActive ? "0 0 8px rgba(1,232,100,0.4)" : "1px 1px 1px rgba(0,0,0,0.8)" }}
+                      {/* Milestone Marker Node (Circle) */}
+                      <div
+                        data-timeline-circle={index}
+                        className="absolute left-4 sm:left-6 md:left-1/2 -translate-x-1/2 z-20 flex items-center justify-center"
                       >
-                        {m.num} — {m.title}
-                      </p>
-                      
-                      {isActive && (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.95 }} 
-                          animate={{ opacity: 1, scale: 1 }} 
-                          className="mt-3 relative overflow-hidden rounded-lg p-5 flex flex-col gap-2 max-w-[280px] sm:max-w-md"
-                          style={{ 
-                            background: "linear-gradient(145deg, #181d1a 0%, #0d120f 100%)",
-                            borderTop: "2px solid #2a352e",
-                            borderLeft: "2px solid #2a352e",
-                            borderBottom: "2px solid #050806",
-                            borderRight: "2px solid #050806",
-                            boxShadow: "10px 10px 20px rgba(0,0,0,0.9), -1px -1px 5px rgba(255,255,255,0.02), inset 1px 1px 2px rgba(1,232,100,0.1), inset -1px -1px 5px rgba(0,0,0,0.8), 0 0 30px rgba(1,232,100,0.05)"
+                        <div
+                          className={`relative flex items-center justify-center rounded-full border-2 transition-all duration-300 ${
+                            isCurrent
+                              ? isImportant
+                                ? "h-8 w-8 sm:h-9 sm:w-9 border-[#ffb000] bg-[#241a05] shadow-[0_0_24px_#ffb000,0_0_10px_#ffb000] scale-110"
+                                : "h-8 w-8 sm:h-9 sm:w-9 border-[#01E864] bg-[#0c2416] shadow-[0_0_24px_#01E864,0_0_10px_#01E864] scale-110"
+                              : isPassed
+                                ? isImportant
+                                  ? "h-7 w-7 sm:h-8 sm:w-8 border-[#ffb000]/80 bg-[#140e03] shadow-[0_0_10px_rgba(255,176,0,0.3)]"
+                                  : "h-7 w-7 sm:h-8 sm:w-8 border-[#01E864]/80 bg-[#06140b] shadow-[0_0_10px_rgba(1,232,100,0.3)]"
+                                : isImportant
+                                  ? "h-7 w-7 sm:h-8 sm:w-8 border-[#543f11] bg-[#0b0903] opacity-60"
+                                  : "h-7 w-7 sm:h-8 sm:w-8 border-[#1a2d21] bg-[#050e09] opacity-60"
+                          }`}
+                        >
+                          <div
+                            className={`rounded-full transition-all duration-300 ${
+                              isCurrent
+                                ? isImportant
+                                  ? "h-3 w-3 bg-[#ffb000] shadow-[0_0_8px_#ffb000]"
+                                  : "h-3 w-3 bg-[#01E864] shadow-[0_0_8px_#01E864]"
+                                : isImportant
+                                  ? "h-2 w-2 bg-[#ffb000]"
+                                  : "h-2 w-2 bg-[#01E864]"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Milestone Card Content */}
+                      <div
+                        className={`ml-11 sm:ml-16 md:ml-0 w-full md:w-[calc(50%-2.75rem)] lg:w-[calc(50%-3.5rem)] ${
+                          isEven ? "md:mr-auto md:pr-4" : "md:ml-auto md:pl-4"
+                        }`}
+                      >
+                        <div
+                          className={`group relative overflow-hidden rounded-lg border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-0.5 ${
+                            isCurrent
+                              ? isImportant
+                                ? "border-[#ffb000] bg-[#110d04] shadow-[0_0_30px_rgba(255,176,0,0.3),inset_0_0_15px_rgba(255,176,0,0.08)]"
+                                : "border-[#01E864] bg-[#08150e] shadow-[0_0_30px_rgba(1,232,100,0.25),inset_0_0_15px_rgba(1,232,100,0.06)]"
+                              : isImportant
+                                ? "border-[#45330e] bg-[#0b0903]/95 hover:border-[#ffb000]/80 hover:shadow-[0_0_25px_rgba(255,176,0,0.22)]"
+                                : "border-[#16291e] bg-[#060e0a]/90 hover:border-[#01E864]/60 hover:shadow-[0_0_25px_rgba(1,232,100,0.15)]"
+                          }`}
+                          style={{
+                            boxShadow: isCurrent
+                              ? undefined
+                              : isImportant
+                                ? "inset 1px 1px 2px rgba(255,200,50,0.05), 0 4px 15px rgba(0,0,0,0.8)"
+                                : "inset 1px 1px 2px rgba(255,255,255,0.03), 0 4px 15px rgba(0,0,0,0.7)",
                           }}
                         >
-                          {/* Hardware Screws */}
-                          <div className="absolute top-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
-                          <div className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
-                          <div className="absolute bottom-2 left-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
-                          <div className="absolute bottom-2 right-2 h-1.5 w-1.5 rounded-full border border-[#000]" style={{ background: "radial-gradient(circle, #444 20%, #111 90%)", boxShadow: "inset 1px 1px 1px rgba(255,255,255,0.2)" }} />
+                          {/* Hardware Corner Rivets */}
+                          <div
+                            className={`absolute top-2 left-2 h-1 w-1 rounded-full ${
+                              isImportant ? "bg-[#543f11]" : "bg-[#203828]"
+                            }`}
+                          />
+                          <div
+                            className={`absolute top-2 right-2 h-1 w-1 rounded-full ${
+                              isImportant ? "bg-[#543f11]" : "bg-[#203828]"
+                            }`}
+                          />
+                          <div
+                            className={`absolute bottom-2 left-2 h-1 w-1 rounded-full ${
+                              isImportant ? "bg-[#543f11]" : "bg-[#203828]"
+                            }`}
+                          />
+                          <div
+                            className={`absolute bottom-2 right-2 h-1 w-1 rounded-full ${
+                              isImportant ? "bg-[#543f11]" : "bg-[#203828]"
+                            }`}
+                          />
 
-                          {/* Recessed Screen */}
-                          <div className="relative mt-2 p-4 rounded bg-[#030604] border border-[#111]" style={{ boxShadow: "inset 3px 3px 10px rgba(0,0,0,0.9), inset -1px -1px 2px rgba(255,255,255,0.03)" }}>
-                            <div className="absolute inset-0 bg-[linear-gradient(rgba(1,232,100,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(1,232,100,0.03)_1px,transparent_1px)] bg-[size:4px_4px] pointer-events-none" />
-                            <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent pointer-events-none" />
-                            
-                            <div className="mb-3 flex items-center justify-between">
-                              <span className="font-mono text-[0.55rem] tracking-[0.2em] text-[#01E864] uppercase opacity-70">● SYSTEM ACTIVE</span>
+                          {/* Scanline Texture */}
+                          <div
+                            className={`absolute inset-0 pointer-events-none rounded-lg ${
+                              isImportant
+                                ? "bg-[linear-gradient(rgba(255,176,0,0.02)_1px,transparent_1px)] bg-[size:100%_4px]"
+                                : "bg-[linear-gradient(rgba(1,232,100,0.015)_1px,transparent_1px)] bg-[size:100%_4px]"
+                            }`}
+                          />
+
+                          {/* Top Row: Time Badge & Milestone Number (KEY & ACTIVE Badges Removed) */}
+                          <div className="relative z-10 flex items-center justify-between gap-2 mb-2 flex-wrap">
+                            <div
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded border ${
+                                isImportant
+                                  ? "bg-[#221703] border-[#ffb000]/40 shadow-[0_0_10px_rgba(255,176,0,0.18)]"
+                                  : "bg-[#0b1c12] border-[#01E864]/30 shadow-[0_0_8px_rgba(1,232,100,0.12)]"
+                              }`}
+                            >
+                              <Clock
+                                className={`w-3 h-3 shrink-0 ${
+                                  isImportant ? "text-[#ffc107]" : "text-[#01E864]"
+                                }`}
+                              />
+                              <span
+                                className={`font-mono text-xs sm:text-[0.8rem] font-bold tracking-wider ${
+                                  isImportant ? "text-[#ffc107]" : "text-[#01E864]"
+                                }`}
+                              >
+                                {event.time}
+                              </span>
                             </div>
-                            
-                            {/* Time details first */}
-                            <p className="font-mono text-[0.65rem] sm:text-xs font-bold tracking-[0.25em] text-[#01E864] mb-1.5 uppercase">{m.date}</p>
-                            {/* Description details second */}
-                            <p className="font-display text-sm tracking-widest text-[#E8FFF2] normal-case leading-relaxed" style={{ textShadow: "0 0 10px rgba(1,232,100,0.5)" }}>{m.desc}</p>
-                          </div>
-                        </motion.div>
-                      )}
-                    </motion.div>
-                  </div>
-                );
-              })}
-            </motion.div>
-          </div>
-        </div>
 
+                            <span
+                              className={`font-mono text-[0.65rem] sm:text-xs font-bold transition-colors ${
+                                isCurrent
+                                  ? isImportant
+                                    ? "text-[#ffc107]"
+                                    : "text-[#01E864]"
+                                  : isImportant
+                                    ? "text-[#6e531c] group-hover:text-[#ffc107]/80"
+                                    : "text-[#3d5346] group-hover:text-[#01E864]/60"
+                              }`}
+                            >
+                              #{String(index + 1).padStart(2, "0")}
+                            </span>
+                          </div>
+
+                          {/* Event Title */}
+                          <h3
+                            className={`relative z-10 font-display text-sm sm:text-base font-bold tracking-wide leading-snug transition-colors ${
+                              isCurrent
+                                ? "#ffffff"
+                                : isImportant
+                                  ? "text-[#FFF8E7] group-hover:text-[#ffffff]"
+                                  : "text-[#E8FFF2] group-hover:text-[#ffffff]"
+                            }`}
+                            style={
+                              isCurrent
+                                ? {
+                                    textShadow: isImportant
+                                      ? "0 0 16px rgba(255,176,0,0.4)"
+                                      : "0 0 16px rgba(1,232,100,0.4)",
+                                  }
+                                : isImportant
+                                  ? { textShadow: "0 0 12px rgba(255,176,0,0.2)" }
+                                  : undefined
+                            }
+                          >
+                            {event.title}
+                          </h3>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );

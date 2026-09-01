@@ -20,6 +20,7 @@ import {
   Zap,
   ScanFace,
   Satellite,
+  ExternalLink,
 } from "lucide-react";
 
 const reveal = {
@@ -50,9 +51,9 @@ const highlights = [
   {
     icon: MapPin,
     label: "Offline Venue",
-    value: "SRM Institute of Science and Technology, KTR Campus",
+    value: "Prof. Peter Drucker Hall, MBA Block (Ground floor, left side)",
   },
-  { icon: Monitor, label: "Online Venue", value: "Official Remote Event Platform" },
+  { icon: Monitor, label: "Online Venue", value: "Google Meet Platform" },
 ];
 
 export function Highlights() {
@@ -474,21 +475,27 @@ export function Venues() {
             {
               icon: MapPin,
               tag: "Offline",
-              title: "SRM Institute of Science and Technology",
-              sub: "KTR Campus, Kattankulathur, Chennai",
+              title: "Prof. Peter Drucker Hall, MBA Block",
+              locationDetail: "Ground floor, left side",
+              sub: "SRM Institute of Science and Technology, KTR Campus, Chennai",
+              href: "https://maps.app.goo.gl/RyTBxsWJRUrJtSvy9",
+              btnLabel: "Open in Google Maps",
             },
             {
               icon: Globe2,
               tag: "Online",
               title: "Official Remote Event Platform",
+              locationDetail: "🌐 Virtual Arena",
               sub: "Livestreamed mentoring, submissions and judging",
+              href: "https://meet.google.com/qnj-cadz-yty",
+              btnLabel: "Join Official Google Meet",
             },
           ].map((v, i) => (
             <motion.div
               key={v.tag}
               {...reveal}
               transition={{ ...reveal.transition, delay: i * 0.1 }}
-              className="group relative overflow-hidden rounded-lg p-8 cursor-pointer"
+              className="group relative overflow-hidden rounded-lg p-8"
               whileHover={{ 
                 y: 3, 
                 boxShadow: "inset 2px 2px 8px rgba(0,0,0,0.9), inset -2px -2px 5px rgba(255,255,255,0.02), 2px 2px 5px rgba(0,0,0,0.5)" 
@@ -512,14 +519,32 @@ export function Venues() {
               </div>
 
               <div className="relative z-10">
-                <span className="inline-block rounded-sm border border-[#444] bg-[#0c0d10] px-2.5 py-1 font-mono text-[0.55rem] tracking-[0.3em] text-primary uppercase shadow-[inset_1px_1px_3px_rgba(0,0,0,0.9)]">
-                  {v.tag}
-                </span>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="inline-block rounded-sm border border-[#444] bg-[#0c0d10] px-2.5 py-1 font-mono text-[0.55rem] tracking-[0.3em] text-primary uppercase shadow-[inset_1px_1px_3px_rgba(0,0,0,0.9)]">
+                    {v.tag}
+                  </span>
+                  {v.locationDetail && (
+                    <span className="font-mono text-[0.7rem] text-primary/90 bg-primary/10 border border-primary/30 px-2.5 py-0.5 rounded shadow-[0_0_10px_rgba(0,168,63,0.15)]">
+                      {v.tag === "Offline" ? `📍 ${v.locationDetail}` : v.locationDetail}
+                    </span>
+                  )}
+                </div>
                 <v.icon className="mt-6 h-8 w-8 text-primary" style={{ filter: "drop-shadow(0 0 5px var(--primary))" }} />
                 <h3 className="text-[#e2e4e9] mt-4 font-mono text-lg font-black tracking-widest uppercase" style={{ textShadow: "1px 1px 2px #000" }}>
                   {v.title}
                 </h3>
                 <p className="mt-2 font-mono text-sm leading-relaxed text-[#9ca3af]">{v.sub}</p>
+                {v.href && (
+                  <a
+                    href={v.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-5 inline-flex items-center gap-2 rounded border border-primary/40 bg-primary/10 px-4 py-2 font-mono text-xs font-semibold text-primary transition-all duration-200 hover:bg-primary/20 hover:border-primary hover:shadow-[0_0_15px_rgba(0,168,63,0.3)] cursor-pointer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    {v.btnLabel || "Open Link"}
+                  </a>
+                )}
               </div>
             </motion.div>
           ))}
